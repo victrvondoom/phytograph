@@ -1,6 +1,5 @@
 """Benchmark determinism and rule behaviour, and the counterfactual simulator (synthetic inputs)."""
 
-import numpy as np
 import pandas as pd
 import pytest
 

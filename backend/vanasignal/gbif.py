@@ -22,7 +22,10 @@ import httpx
 
 from .models import ResolvedSpecies, SpeciesSuggestion
 
-GBIF_API = "https://api.gbif.org/v1"
+GBIF_API = os.environ.get("VANASIGNAL_GBIF_API", "https://api.gbif.org/v1").rstrip("/")  # override only for test/fixture servers
+GBIF_IS_OFFICIAL = GBIF_API == "https://api.gbif.org/v1"
+# Data-mode label for responses fetched live from whichever endpoint is configured.
+LIVE_MODE = "live" if GBIF_IS_OFFICIAL else "non_gbif_test_endpoint"
 USER_AGENT = "VanaSignal/0.1 (biodiversity gap analysis; research prototype)"
 PAGE_SIZE = 300  # GBIF maximum for occurrence/search
 MAX_OFFSET = 100_000  # GBIF maximum offset for occurrence/search
@@ -69,6 +72,7 @@ def parse_occurrence(r: dict[str, Any]) -> dict[str, Any]:
     return {
         "gbif_id": str(r.get("gbifID") or r.get("key")),
         "occurrence_key": r.get("key"),
+        "scientific_name": r.get("scientificName"),
         "species_key": r.get("speciesKey"),
         "accepted_scientific_name": r.get("acceptedScientificName"),
         "lat": r.get("decimalLatitude"),
@@ -117,16 +121,39 @@ class GBIFClient:
     def _cache_file(self, url: str) -> Path:
         return self.cache_dir / f"{hashlib.sha256(url.encode()).hexdigest()}.json"
 
-    def get_json(self, path: str, params: dict[str, Any] | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
-        """GET a GBIF endpoint. Returns ``(body, provenance)``."""
+    def get_json(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
+        *,
+        use_cache: bool = True,
+        allow_stale: bool = False,
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        """GET a GBIF endpoint. Returns ``(body, provenance)``.
+
+        ``use_cache=True`` (default) answers from the on-disk cache when an entry exists; the
+        provenance then has ``from_cache=True`` and the ORIGINAL ``retrieved_at``.
+        ``use_cache=False`` forces a live request. ``allow_stale=True`` falls back to a cached
+        entry, labelled ``from_cache=True`` with ``live_error``, when the live request fails.
+        """
         url = str(httpx.Request("GET", f"{GBIF_API}{path}", params=params or {}).url)
         cache_file = self._cache_file(url)
-        if cache_file.exists():
+        if use_cache and cache_file.exists():
             envelope = json.loads(cache_file.read_text(encoding="utf-8"))
             prov = dict(envelope["provenance"], from_cache=True)
             self.request_log.append(prov)
             return envelope["body"], prov
+        try:
+            return self._live_get(url, cache_file)
+        except GBIFUnavailableError as exc:
+            if allow_stale and cache_file.exists():
+                envelope = json.loads(cache_file.read_text(encoding="utf-8"))
+                prov = dict(envelope["provenance"], from_cache=True, live_error=str(exc))
+                self.request_log.append(prov)
+                return envelope["body"], prov
+            raise
 
+    def _live_get(self, url: str, cache_file: Path) -> tuple[dict[str, Any], dict[str, Any]]:
         last_error = "unknown"
         for attempt in range(self.max_retries + 1):
             try:

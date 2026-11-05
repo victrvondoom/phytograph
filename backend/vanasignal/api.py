@@ -32,7 +32,7 @@ EXPORTS = {
 }
 
 
-def create_app(settings: Settings | None = None, client: GBIFClient | None = None) -> FastAPI:
+def create_app(settings: Settings | None = None, client: GBIFClient | None = None, origin_transport=None) -> FastAPI:
     settings = settings or get_settings()
     settings.runs_dir.mkdir(parents=True, exist_ok=True)
     app = FastAPI(title="VanaSignal API", version="0.1.0")
@@ -42,7 +42,7 @@ def create_app(settings: Settings | None = None, client: GBIFClient | None = Non
         allow_methods=["GET", "POST"],
         allow_headers=["Content-Type"],
     )
-    state: dict[str, Any] = {"client": client}
+    state: dict[str, Any] = {"client": client, "transport": origin_transport}
 
     def gbif() -> GBIFClient:
         if state["client"] is None:
@@ -72,6 +72,15 @@ def create_app(settings: Settings | None = None, client: GBIFClient | None = Non
     @app.exception_handler(GBIFError)
     async def _gbif_error(_: Request, exc: GBIFError):
         return JSONResponse(status_code=502, content={"code": "gbif_error", "message": str(exc)})
+
+    from .origin.routes import build_origin_router
+
+    def origin_client() -> GBIFClient:
+        if state.get("origin_client") is None:
+            state["origin_client"] = GBIFClient(settings.cache_dir, timeout=12.0, max_retries=2, backoff_seconds=1.0, transport=state.get("transport"))
+        return state["origin_client"]
+
+    app.include_router(build_origin_router(settings, origin_client))
 
     @app.get("/api/health")
     def health() -> dict[str, Any]:

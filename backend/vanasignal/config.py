@@ -18,6 +18,8 @@ class Settings:
         default_factory=lambda: tuple(o.strip() for o in os.environ.get("VANASIGNAL_CORS_ORIGINS", "http://localhost:3000").split(",") if o.strip())
     )
 
+    db_path: Path = field(default_factory=lambda: Path(os.environ.get("VANASIGNAL_DB", BACKEND_DIR / "data" / "vanasignal.sqlite3")))
+
     @property
     def cache_dir(self) -> Path:
         return self.data_dir / "cache" / "gbif"

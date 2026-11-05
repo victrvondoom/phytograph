@@ -1,6 +1,4 @@
 node_modules/
-.next/
-out/
-next-env.d.ts
-*.tsbuildinfo
+dist/
 public/maplibre-gl-worker.mjs
+*.tsbuildinfo

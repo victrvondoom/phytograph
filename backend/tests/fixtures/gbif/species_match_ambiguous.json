@@ -1,0 +1,5 @@
+{"_fixture": "hand-authored; not live GBIF data", "usageKey": 900000301, "scientificName": "Withania somnifera (L.) Dunal", "canonicalName": "Withania somnifera", "rank": "SPECIES", "status": "ACCEPTED", "matchType": "FUZZY", "confidence": 88, "kingdom": "Plantae", "acceptedUsageKey": 900000301,
+ "alternatives": [
+  {"usageKey": 900000302, "scientificName": "Withania somnifera var. fixture-a", "rank": "VARIETY", "status": "ACCEPTED", "matchType": "FUZZY", "confidence": 88, "kingdom": "Plantae", "acceptedUsageKey": 900000302},
+  {"usageKey": 900000303, "scientificName": "Withania somnifer-like fixture", "rank": "SPECIES", "status": "DOUBTFUL", "matchType": "FUZZY", "confidence": 80, "kingdom": "Plantae"}
+ ]}

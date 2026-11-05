@@ -1,4 +1,23 @@
-# VanaSignal
+# VanaSignal: Botanical Origin Evidence Gate
+
+Don't just track where a medicinal plant came from. Check whether the evidence supports the origin claim.
+
+See [AGENTS.md](AGENTS.md) for scope, scientific rules and limitations, and [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) for verified status.
+
+**Live GBIF was not reachable from the build environment.** Results shown with a "NOT GBIF" or "Cached" label come from hand-authored fixtures or a local fixture server, not from api.gbif.org.
+
+## Run it
+
+```bash
+cd backend && python -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
+pytest
+uvicorn vanasignal.api:app --port 8000
+python -m vanasignal.origin.seed        # labelled SYNTHETIC sample batches
+
+cd frontend && npm install && npm run dev   # http://localhost:5173
+```
+
+Optional: `VANASIGNAL_GBIF_API` overrides the GBIF base URL (only for test servers; data is then labelled NOT GBIF).
 
 Biodiversity intelligence for medicinal-plant occurrence data (EthnoHack 2026, Track 3).
 VanaSignal finds occurrence-data gaps, audits record quality, checks protected-area coverage and

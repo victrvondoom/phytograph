@@ -1,0 +1,26 @@
+{"_note": "Expected classes for occurrence_planted_errors.json, written BEFORE running the classifier. Duplicate-ID row is the second 1001.",
+ "declared_point": [11.6, 76.0],
+ "uncertainty_threshold_m": 5000,
+ "expected": [
+  {"row": 0, "gbif_id": "1001", "class": "usable", "codes": []},
+  {"row": 1, "gbif_id": "1002", "class": "usable", "codes": []},
+  {"row": 2, "gbif_id": "1003", "class": "usable", "codes": []},
+  {"row": 3, "gbif_id": "1004", "class": "usable", "codes": []},
+  {"row": 4, "gbif_id": "1005", "class": "invalid", "codes": ["ZERO_COORDINATES", "GBIF_SEVERE_GEOSPATIAL_ISSUE"]},
+  {"row": 5, "gbif_id": "1006", "class": "invalid", "codes": ["INVALID_COORDINATE_RANGE"]},
+  {"row": 6, "gbif_id": "1001", "class": "duplicate", "codes": ["DUPLICATE_OCCURRENCE_ID"]},
+  {"row": 7, "gbif_id": "1008", "class": "duplicate", "codes": ["DUPLICATE_COORDINATE_DATE"]},
+  {"row": 8, "gbif_id": "1009", "class": "usable_with_caution", "codes": ["EXCESSIVE_COORDINATE_UNCERTAINTY"]},
+  {"row": 9, "gbif_id": "1010", "class": "insufficient_for_spatial_check", "codes": ["MISSING_COORDINATES"]},
+  {"row": 10, "gbif_id": "1011", "class": "usable_with_caution", "codes": ["MISSING_OBSERVATION_DATE"]},
+  {"row": 11, "gbif_id": "1012", "class": "usable_with_caution", "codes": ["MISSING_DATASET_ATTRIBUTION"]},
+  {"row": 12, "gbif_id": "1013", "class": "usable_with_caution", "codes": ["REPEATED_COORDINATES"]},
+  {"row": 13, "gbif_id": "1014", "class": "usable_with_caution", "codes": ["REPEATED_COORDINATES"]},
+  {"row": 14, "gbif_id": "1015", "class": "usable_with_caution", "codes": ["REPEATED_COORDINATES"]},
+  {"row": 15, "gbif_id": "1016", "class": "usable_with_caution", "codes": ["OUTSIDE_DEMONSTRATION_REGION"]},
+  {"row": 16, "gbif_id": "1017", "class": "usable_with_caution", "codes": ["NON_FIELD_BASIS"]},
+  {"row": 17, "gbif_id": "1018", "class": "usable_with_caution", "codes": ["GBIF_SEVERE_GEOSPATIAL_ISSUE"]},
+  {"row": 18, "gbif_id": "1019", "class": "usable_with_caution", "codes": ["UNKNOWN_COORDINATE_UNCERTAINTY"]}
+ ],
+ "expected_counts": {"usable": 4, "usable_with_caution": 10, "insufficient_for_spatial_check": 1, "invalid": 2, "duplicate": 2}
+}

@@ -14,3 +14,4 @@ frontend/out/
 frontend/next-env.d.ts
 frontend/*.tsbuildinfo
 frontend/public/maplibre-gl-worker.mjs
+backend/data/*.sqlite3*
