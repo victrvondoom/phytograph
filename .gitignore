@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+backend/.venv/
+# Generated analysis data (cache and run bundles are reproducible; do not commit)
+backend/data/cache/
+backend/data/runs/
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/next-env.d.ts
+frontend/*.tsbuildinfo
+frontend/public/maplibre-gl-worker.mjs
