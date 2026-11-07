@@ -157,7 +157,7 @@ export default function AuditWorkspace() {
                   ["Nearest usable record", origin.evidence.nearest_usable_record_km != null ? `${Number(origin.evidence.nearest_usable_record_km).toFixed(1)} km` : "n/a"],
                   ["Rule", `${origin.evidence.near_radius_km ?? "n/a"} km near · ${origin.evidence.min_support_records ?? "n/a"} records minimum`],
                 ]} />
-                <details className="rounded-lg bg-white/[0.03] p-3 text-[12px] text-fg2">
+                <details className="rounded-lg bg-[#143014]/[0.03] p-3 text-[12px] text-fg2">
                   <summary className="cursor-pointer font-medium text-fg">Limitations of this status</summary>
                   <ul className="mt-2 list-disc space-y-1.5 pl-4">{origin.limitations.map((l) => <li key={l}>{l}</li>)}</ul>
                 </details>
@@ -170,7 +170,7 @@ export default function AuditWorkspace() {
               {ROBOTS.map((r) => (
                 <li key={r.id}>
                   <button type="button" onClick={() => setRobot(r.id)} aria-pressed={robot === r.id}
-                    className={`flex w-full items-center justify-between gap-3 rounded-lg px-2 py-2.5 text-left transition-colors ${robot === r.id ? "bg-brand/10" : "hover:bg-white/[0.03]"}`}>
+                    className={`flex w-full items-center justify-between gap-3 rounded-lg px-2 py-2.5 text-left transition-colors ${robot === r.id ? "bg-sky/10" : "hover:bg-[#143014]/[0.03]"}`}>
                     <span className="min-w-0">
                       <span className="block text-[13px] font-medium text-fg">{r.name}</span>
                       <span className="block truncate text-[11.5px] text-fg3">{robot === r.id ? r.job : r.module}</span>
@@ -305,7 +305,7 @@ export default function AuditWorkspace() {
                 const isSel = r.gbif_id === selected;
                 return (
                   <tr key={`${r.gbif_id}-${r.occurrence_key ?? ""}`} onClick={() => setSelected(r.gbif_id)} aria-selected={isSel}
-                    className={`cursor-pointer border-b border-edge/60 transition-colors hover:bg-white/[0.03] ${isSel ? "bg-brand/[0.08]" : ""}`}>
+                    className={`cursor-pointer border-b border-edge/60 transition-colors hover:bg-[#143014]/[0.03] ${isSel ? "bg-sky/[0.10]" : ""}`}>
                     <td className="px-3 py-2.5"><ClassBadge value={classes[r.gbif_id] ?? "usable"} /></td>
                     <td className="px-3 py-2.5 font-mono text-[12px]">{r.gbif_id}</td>
                     <td className="px-3 py-2.5 text-[12px]">{r.event_date ?? <span className="text-warn">missing</span>}</td>
@@ -393,7 +393,7 @@ function ProvenanceStrip({ synthetic, cachedAt, notGbif, notGbifOrigin, errorMes
 function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button type="button" onClick={onClick} aria-pressed={active}
-      className={`rounded-full px-3 py-1 text-[12px] font-medium ring-1 ring-inset transition-colors ${active ? "bg-brand text-white ring-brand" : "bg-white/[0.03] text-fg2 ring-edge2 hover:text-fg"}`}>
+      className={`rounded-full px-3 py-1 text-[12px] font-medium ring-1 ring-inset transition-colors ${active ? "bg-brand text-white ring-brand" : "bg-[#143014]/[0.03] text-fg2 ring-edge2 hover:text-fg"}`}>
       {children}
     </button>
   );

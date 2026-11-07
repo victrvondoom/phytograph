@@ -48,7 +48,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         {nav.map((n) => {
           const active = location.pathname.startsWith(n.match);
           return (
-            <NavLink key={n.to} to={n.to} title={n.label} aria-label={n.label} className={`group relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors ${active ? "bg-brand/15 text-brand" : "text-fg3 hover:bg-white/[0.05] hover:text-fg"}`}>
+            <NavLink key={n.to} to={n.to} title={n.label} aria-label={n.label} className={`group relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors ${active ? "bg-sky/15 text-brand" : "text-fg3 hover:bg-[#143014]/[0.05] hover:text-fg"}`}>
               {active ? <span className="absolute -left-[13px] h-6 w-[3px] rounded-r bg-brand" aria-hidden /> : null}
               <Icon d={n.icon} />
             </NavLink>
@@ -57,7 +57,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-edge bg-canvas/85 backdrop-blur">
+        <header className="sticky top-0 z-20 border-b border-edge bg-white/90 backdrop-blur">
           <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
             <div className="flex min-w-0 items-center gap-3">
               <span className="md:hidden"><Logo /></span>
@@ -71,11 +71,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <div className="flex flex-wrap items-center justify-end gap-2 text-[11.5px]">
               {offline ? <span className="rounded-full bg-bad/10 px-2.5 py-1 text-bad ring-1 ring-inset ring-bad/30">API offline</span> : status ? (
                 <>
-                  <span className="rounded-full bg-brand/10 px-2.5 py-1 text-brand ring-1 ring-inset ring-brand/25"><span className="sm:hidden">API ●</span><span className="hidden sm:inline">API online · v{status.version}</span></span>
-                  <span className={`hidden rounded-full px-2.5 py-1 ring-1 ring-inset md:inline-flex ${status.gbif_is_official ? "bg-brand/10 text-brand ring-brand/25" : "bg-bad/10 text-bad ring-bad/30"}`}>
+                  <span className="rounded-full bg-sky/10 px-2.5 py-1 text-brand ring-1 ring-inset ring-brand/25"><span className="sm:hidden">API ●</span><span className="hidden sm:inline">API online · v{status.version}</span></span>
+                  <span className={`hidden rounded-full px-2.5 py-1 ring-1 ring-inset md:inline-flex ${status.gbif_is_official ? "bg-sky/10 text-brand ring-brand/25" : "bg-bad/10 text-bad ring-bad/30"}`}>
                     {status.gbif_is_official ? "GBIF: api.gbif.org" : "GBIF: test endpoint (not GBIF)"}
                   </span>
-                  <span className={`hidden rounded-full px-2.5 py-1 ring-1 ring-inset lg:inline-flex ${status.write_token_required ? "bg-violet/10 text-violet ring-violet/30" : "bg-white/[0.04] text-fg3 ring-edge2"}`}>
+                  <span className={`hidden rounded-full px-2.5 py-1 ring-1 ring-inset lg:inline-flex ${status.write_token_required ? "bg-violet/10 text-violet ring-violet/30" : "bg-[#143014]/[0.04] text-fg3 ring-edge2"}`}>
                     {status.write_token_required ? "Writes: token required" : "Writes: open (local)"}
                   </span>
                 </>
@@ -84,7 +84,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </div>
           <nav aria-label="Sections" className="flex gap-1 overflow-x-auto px-4 pb-2 md:hidden">
             {nav.map((n) => (
-              <NavLink key={n.to} to={n.to} className={({ isActive }) => `rounded-md px-3 py-1.5 text-[13px] ${isActive ? "bg-brand/15 text-brand" : "text-fg2"}`}>{n.label}</NavLink>
+              <NavLink key={n.to} to={n.to} className={({ isActive }) => `rounded-md px-3 py-1.5 text-[13px] ${isActive ? "bg-sky/15 text-brand" : "text-fg2"}`}>{n.label}</NavLink>
             ))}
           </nav>
         </header>

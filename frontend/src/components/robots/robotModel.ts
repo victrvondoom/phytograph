@@ -2,12 +2,12 @@ import * as THREE from "three";
 import type { RobotState } from "../../lib/robots";
 
 export const STATE_COLOR: Record<RobotState, number> = {
-  idle: 0x4b5d66,
-  running: 0xf2b84b,
-  ok: 0x3fd0a5,
-  attention: 0xe4705a,
-  failed: 0xff4d6d,
-  skipped: 0x6b7b86,
+  idle: 0x9aafbd,
+  running: 0x53a8ea,
+  ok: 0x809323,
+  attention: 0xc2472f,
+  failed: 0xa33a24,
+  skipped: 0xaab4bd,
 };
 
 export interface RobotRig {
@@ -22,9 +22,9 @@ export interface RobotRig {
   scale: number;
 }
 
-const shell = new THREE.MeshStandardMaterial({ color: 0xd9e4df, metalness: 0.35, roughness: 0.32 });
-const joint = new THREE.MeshStandardMaterial({ color: 0x2a3b35, metalness: 0.6, roughness: 0.4 });
-const visorMat = new THREE.MeshStandardMaterial({ color: 0x0d1714, emissive: 0x3fd0a5, emissiveIntensity: 0.9, metalness: 0.2, roughness: 0.1 });
+const shell = new THREE.MeshStandardMaterial({ color: 0xf4f8fb, metalness: 0.35, roughness: 0.32 });
+const joint = new THREE.MeshStandardMaterial({ color: 0x486a8c, metalness: 0.6, roughness: 0.4 });
+const visorMat = new THREE.MeshStandardMaterial({ color: 0x143014, emissive: 0x53a8ea, emissiveIntensity: 0.9, metalness: 0.2, roughness: 0.1 });
 
 /** A humanoid robot built from primitives: torso, head with visor, articulated arms and legs, status chest light. */
 export function buildRobot(accent: number, scale = 1): RobotRig {
@@ -119,7 +119,7 @@ export function setRobotState(rig: RobotRig, state: RobotState): void {
   mat.color.setHex(color);
   mat.emissive.setHex(color);
   const vm = rig.visor.material as THREE.MeshStandardMaterial;
-  vm.emissive.setHex(state === "failed" ? 0xff4d6d : state === "attention" ? 0xf2b84b : state === "ok" ? 0x3fd0a5 : 0x5b6f78);
+  vm.emissive.setHex(state === "failed" ? 0xff4d6d : state === "attention" ? 0xf2b84b : state === "ok" ? 0x53a8ea : 0x5b6f78);
   vm.emissiveIntensity = state === "idle" || state === "skipped" ? 0.25 : 0.95;
 }
 

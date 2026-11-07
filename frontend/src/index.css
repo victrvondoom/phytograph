@@ -1,48 +1,48 @@
+@import "@fontsource-variable/inter";
 @import "tailwindcss";
 
 /* VanaSignal design system. One accent (teal), natural neutrals, and semantic colours used only for meaning. */
+/* Palette sampled from the reference photograph (sunlit grass, open sky, shadow green, gravel). */
 @theme {
-  --color-canvas: #0a1a34;
-  --color-panel: #0f2243;
-  --color-panel2: #132a52;
-  --color-raised: #1a3562;
-  --color-edge: #1f3a66;
-  --color-edge2: #2e5088;
-  --color-fg: #f5f8fc;
-  --color-fg2: #b9c8de;
-  --color-fg3: #7e93b5;
-  --color-brand: #ff7b61;
-  --color-brand2: #e5593f;
-  --color-good: #4fd1a5;
-  --color-warn: #f2b65a;
-  --color-bad: #ff6b6b;
-  --color-info: #8ad3ff;
-  --color-synth: #c9a7ff;
-  --color-violet: #a99bff;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-canvas: #eef6fb;   /* pale sky */
+  --color-panel: #ffffff;
+  --color-panel2: #f4f9ec;   /* faint lime wash */
+  --color-raised: #e2eff8;   /* sky wash */
+  --color-edge: #d3e4ee;
+  --color-edge2: #b3cfe0;
+  --color-fg: #143014;       /* shadow green: primary text */
+  --color-fg2: #355238;
+  --color-fg3: #5d7660;
+  --color-brand: #143014;    /* primary actions */
+  --color-sky: #53a8ea;      /* sky blue accent */
+  --color-sky2: #2f7fbf;     /* sky blue for text on white */
+  --color-lime: #aebe3b;     /* sunlit grass */
+  --color-leaf: #809323;     /* mid grass */
+  --color-good: #4c6e12;
+  --color-warn: #a36d12;
+  --color-bad: #c2472f;      /* coral */
+  --color-info: #2f7fbf;
+  --color-synth: #6a5ea8;
+  --color-violet: #6a5ea8;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 html, body, #root { height: 100%; }
 body {
-  /* Navy field with a soft white light at the centre, as a professional backdrop. */
-  background:
-    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(255,255,255,0.13), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(255,255,255,0.05), transparent 70%),
-    var(--color-canvas);
-  background-attachment: fixed;
+  background: var(--color-canvas);
   color: var(--color-fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   font-feature-settings: "cv11", "ss01";
 }
-::selection { background: rgba(255, 123, 97, 0.35); }
+::selection { background: rgba(83, 168, 234, 0.35); }
 :focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; border-radius: 6px; }
 .maplibregl-ctrl-attrib { display: none; }
 .maplibregl-ctrl-group { background: var(--color-panel) !important; border: 1px solid var(--color-edge) !important; }
 .maplibregl-ctrl-group button { background-color: transparent !important; }
 .maplibregl-ctrl-group button + button { border-top: 1px solid var(--color-edge) !important; }
-.maplibregl-ctrl-group button span { filter: invert(0.9); }
+.maplibregl-ctrl-group button span { filter: none; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .rise { animation: rise 420ms cubic-bezier(.2,.7,.2,1) both; }
 @media (prefers-reduced-motion: reduce) { .rise { animation: none; } }

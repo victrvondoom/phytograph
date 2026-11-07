@@ -29,7 +29,7 @@ export function Card({ title, eyebrow, children, actions, id, className = "" }: 
 
 export type Tone = "neutral" | "good" | "warn" | "bad" | "synth" | "info" | "violet";
 const TONE: Record<Tone, string> = {
-  neutral: "bg-white/[0.04] text-fg2 ring-edge2",
+  neutral: "bg-[#143014]/[0.04] text-fg2 ring-edge2",
   good: "bg-good/10 text-good ring-good/30",
   warn: "bg-warn/10 text-warn ring-warn/30",
   bad: "bg-bad/10 text-bad ring-bad/30",
@@ -82,11 +82,11 @@ export function Stat({ label, value, hint, tone }: { label: string; value: React
 
 export function Notice({ tone, title, children }: { tone: "error" | "warn" | "info" | "synthetic" | "ok"; title: string; children?: ReactNode }) {
   const style = {
-    error: "border-bad/40 bg-bad/[0.07] text-[#ffc2b5]",
-    warn: "border-warn/40 bg-warn/[0.07] text-[#f5d9a4]",
-    info: "border-info/30 bg-info/[0.06] text-[#c7ecff]",
-    synthetic: "border-synth/35 bg-synth/[0.07] text-[#ebd3ff]",
-    ok: "border-brand/35 bg-brand/[0.07] text-[#c4f5e4]",
+    error: "border-bad/40 bg-bad/[0.07] text-fg2",
+    warn: "border-warn/40 bg-warn/[0.07] text-fg2",
+    info: "border-info/30 bg-info/[0.06] text-fg2",
+    synthetic: "border-synth/35 bg-synth/[0.07] text-fg2",
+    ok: "border-brand/35 bg-sky/[0.08] text-fg2",
   }[tone];
   return (
     <div role={tone === "error" ? "alert" : "status"} className={`rise rounded-xl border px-4 py-3 text-sm ${style}`}>
@@ -99,7 +99,7 @@ export function Notice({ tone, title, children }: { tone: "error" | "warn" | "in
 export function Loading({ children }: { children?: ReactNode }) {
   return (
     <div role="status" aria-live="polite" className="flex items-center gap-3 py-10 text-sm text-fg2">
-      <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand/25 border-t-brand" aria-hidden />
+      <span className="h-4 w-4 animate-spin rounded-full border-2 border-sky/40 border-t-brand" aria-hidden />
       {children ?? "Loading…"}
     </div>
   );
@@ -132,9 +132,9 @@ export function Button({ children, onClick, type = "button", variant = "primary"
   children: ReactNode; onClick?: () => void; type?: "button" | "submit"; variant?: "primary" | "secondary" | "ghost" | "danger"; disabled?: boolean; href?: string; title?: string; download?: boolean;
 }) {
   const style = {
-    primary: "bg-brand text-white hover:bg-[#ff9580] disabled:bg-brand/40 disabled:text-white/70",
-    secondary: "border border-edge2 bg-raised text-fg hover:border-brand/50 hover:text-brand disabled:opacity-40",
-    ghost: "text-brand hover:bg-brand/10 disabled:opacity-40",
+    primary: "bg-brand text-white hover:bg-[#ff9580] disabled:bg-brand/40 disabled:text-white/80",
+    secondary: "border border-edge2 bg-raised text-fg hover:border-sky/60 hover:text-brand disabled:opacity-40",
+    ghost: "text-brand hover:bg-sky/10 disabled:opacity-40",
     danger: "bg-bad/90 text-white hover:bg-bad disabled:opacity-40",
   }[variant];
   const cls = `inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-[13px] font-semibold transition-colors disabled:cursor-not-allowed ${style}`;

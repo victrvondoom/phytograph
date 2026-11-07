@@ -37,14 +37,20 @@ export default function BatchInbox() {
 
   return (
     <div className="space-y-6">
-      <div className="rise flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-fg3">Batch inbox</div>
-          <h1 className="mt-1.5 text-2xl font-semibold tracking-tight text-fg">Supplier claims to verify</h1>
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-fg2">Each batch is a supplier claim. Open its audit to compare the declared identity and location with public GBIF evidence, and see what is still missing.</p>
+      <section className="rise relative overflow-hidden rounded-3xl text-white shadow-[0_18px_50px_-24px_rgba(20,48,20,0.55)]">
+        <img src="/hero/landscape.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#143014]/92 via-[#143014]/55 to-[#143014]/10" aria-hidden />
+        <div className="relative flex flex-wrap items-end justify-between gap-6 px-8 py-10 sm:px-10 sm:py-14">
+          <div className="max-w-3xl">
+            <div className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#aebe3b]">VanaSignal · Botanical Origin Evidence Gate</div>
+            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-[52px] sm:leading-[1.05]">Verify the origin of every batch</h1>
+            <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/90">Each batch is a supplier claim. Compare the declared identity and location with public GBIF evidence, and see what is still missing before a decision.</p>
+          </div>
+          <div className="flex gap-3">
+            <Button href="/batches/new">New batch</Button>
+          </div>
         </div>
-        <Button href="/batches/new">New batch</Button>
-      </div>
+      </section>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Batches" value={stats.total} />
@@ -80,7 +86,7 @@ export default function BatchInbox() {
                 <td className="whitespace-nowrap px-3 py-3.5"><DataModeBadge mode={b.data_origin} /></td>
                 <td className="px-3 py-3.5">
                   <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/[0.07]"><div className="h-full rounded-full bg-brand" style={{ width: `${Math.round(b.completeness.completeness_share * 100)}%` }} /></div>
+                    <div className="h-1.5 w-16 overflow-hidden rounded-full bg-[#143014]/[0.07]"><div className="h-full rounded-full bg-brand" style={{ width: `${Math.round(b.completeness.completeness_share * 100)}%` }} /></div>
                     <span className="tabular-nums text-fg">{Math.round(b.completeness.completeness_share * 100)}%</span>
                   </div>
                 </td>
@@ -107,7 +113,7 @@ export default function BatchInbox() {
                 <td className="px-3 py-3.5 whitespace-nowrap">
                   <div className="flex gap-2">
                     <Link className="rounded-lg bg-brand px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[#ff9580]" to={`/batches/${encodeURIComponent(b.batch_id)}/audit`}>Open audit</Link>
-                    <Link className="rounded-lg border border-edge2 px-3 py-1.5 text-[12px] font-medium text-fg2 hover:border-brand/50 hover:text-brand" to={`/batches/${encodeURIComponent(b.batch_id)}/edit`}>Edit</Link>
+                    <Link className="rounded-lg border border-edge2 px-3 py-1.5 text-[12px] font-medium text-fg2 hover:border-sky/60 hover:text-brand" to={`/batches/${encodeURIComponent(b.batch_id)}/edit`}>Edit</Link>
                   </div>
                 </td>
               </tr>

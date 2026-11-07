@@ -96,7 +96,7 @@ export default function ArchitectureStudio() {
                 <SectionTitle>Writes</SectionTitle>
                 <div className="flex flex-wrap gap-1.5">{node.outputs.map((o) => <Pill key={o} tone="info">{o}</Pill>)}</div>
               </div>
-              <div className="rounded-lg bg-white/[0.03] p-3 text-[12.5px] text-fg2">
+              <div className="rounded-lg bg-[#143014]/[0.03] p-3 text-[12.5px] text-fg2">
                 <span className="font-medium text-fg">Never does:</span> {node.deterministic ? "call a language model, invent a record, or decide origin status by hand." : "close a batch without a named person and a specific audit."}
               </div>
               <div className="font-mono text-[11.5px] text-fg3">{node.module}</div>
@@ -110,7 +110,7 @@ export default function ArchitectureStudio() {
                   <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${c.status === "enforced" ? "bg-brand" : "bg-violet"}`} aria-hidden />
                   <div>
                     <div className="flex items-center gap-2 text-[13px] font-medium text-fg">{c.control}
-                      <span className={`rounded px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide ${c.status === "enforced" ? "bg-brand/10 text-brand" : "bg-violet/10 text-violet"}`}>{c.status === "enforced" ? "enforced" : "configure"}</span>
+                      <span className={`rounded px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide ${c.status === "enforced" ? "bg-sky/10 text-brand" : "bg-violet/10 text-violet"}`}>{c.status === "enforced" ? "enforced" : "configure"}</span>
                     </div>
                     <div className="text-[12.5px] leading-relaxed text-fg3">{c.detail}</div>
                   </div>

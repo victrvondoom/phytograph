@@ -13,7 +13,7 @@ const STATUS_HEX: Record<OriginStatus | "none", string> = {
   NOT_CHECKED: "#7e93b5",
   none: "#7e93b5",
 };
-const STYLE: StyleSpecification = { version: 8, sources: {}, layers: [{ id: "bg", type: "background", paint: { "background-color": "#0a1a34" } }] };
+const STYLE: StyleSpecification = { version: 8, sources: {}, layers: [{ id: "bg", type: "background", paint: { "background-color": "#eef6fb" } }] };
 const OPERATIONAL = new Set(["Kerala", "Tamil Nadu"]);
 
 /** Every batch's DECLARED point over the real state boundaries. Colour = latest audited origin status, nothing else. */
@@ -34,9 +34,9 @@ export default function PortfolioMap({ batches }: { batches: BatchRead[] }) {
     m.on("load", async () => {
       m.addSource("states", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       m.addSource("batches", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-      m.addLayer({ id: "states-fill", type: "fill", source: "states", paint: { "fill-color": ["case", ["==", ["get", "operational"], 1], "#ff7b61", "#14305c"], "fill-opacity": ["case", ["==", ["get", "operational"], 1], 0.18, 0.5] } });
-      m.addLayer({ id: "states-line", type: "line", source: "states", paint: { "line-color": ["case", ["==", ["get", "operational"], 1], "#ff7b61", "#2e5088"], "line-width": ["case", ["==", ["get", "operational"], 1], 1.6, 0.6] } });
-      m.addLayer({ id: "batch-dot", type: "circle", source: "batches", paint: { "circle-radius": 7, "circle-color": ["get", "color"], "circle-stroke-color": "#0a1a34", "circle-stroke-width": 2 } });
+      m.addLayer({ id: "states-fill", type: "fill", source: "states", paint: { "fill-color": ["case", ["==", ["get", "operational"], 1], "#53a8ea", "#e4f0d2"], "fill-opacity": ["case", ["==", ["get", "operational"], 1], 0.18, 0.5] } });
+      m.addLayer({ id: "states-line", type: "line", source: "states", paint: { "line-color": ["case", ["==", ["get", "operational"], 1], "#53a8ea", "#8fb3a0"], "line-width": ["case", ["==", ["get", "operational"], 1], 1.6, 0.6] } });
+      m.addLayer({ id: "batch-dot", type: "circle", source: "batches", paint: { "circle-radius": 7, "circle-color": ["get", "color"], "circle-stroke-color": "#eef6fb", "circle-stroke-width": 2 } });
       m.on("click", "batch-dot", (e) => {
         const id = e.features?.[0]?.properties?.batch_id;
         if (typeof id === "string") navRef.current(`/batches/${encodeURIComponent(id)}/audit`);
@@ -65,7 +65,7 @@ export default function PortfolioMap({ batches }: { batches: BatchRead[] }) {
   return (
     <div className="relative h-[380px] w-full overflow-hidden rounded-2xl border border-edge bg-canvas">
       <div ref={el} className="absolute inset-0" style={{ position: "absolute", inset: 0 }} role="application" aria-label="Map of declared batch locations coloured by origin status" />
-      <div className="pointer-events-none absolute bottom-3 left-3 flex flex-wrap gap-x-4 gap-y-1.5 rounded-xl border border-edge bg-canvas/90 px-3 py-2 text-[11.5px] text-fg2">
+      <div className="pointer-events-none absolute bottom-3 left-3 flex flex-wrap gap-x-4 gap-y-1.5 rounded-xl border border-edge bg-white/95 px-3 py-2 text-[11.5px] text-fg2">
         {(["CORROBORATED", "LOCATION_CONFLICT", "INSUFFICIENT_PUBLIC_RECORDS", "IDENTITY_UNRESOLVED", "NOT_CHECKED", "none"] as const).map((k) => (
           <span key={k} className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: STATUS_HEX[k] }} />{k === "none" ? "Not audited" : ORIGIN_LABEL[k]}</span>
         ))}

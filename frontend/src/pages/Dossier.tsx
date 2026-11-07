@@ -120,7 +120,7 @@ export default function Dossier() {
             <fieldset className="space-y-2">
               <legend className="mb-2 text-[12.5px] font-medium text-fg">Decision on this audit</legend>
               {DECISIONS.map((d) => (
-                <label key={d.value} className={`flex cursor-pointer gap-3 rounded-lg border p-3 text-[13px] ${decision === d.value ? "border-brand/50 bg-brand/[0.06]" : "border-edge hover:border-edge2"}`}>
+                <label key={d.value} className={`flex cursor-pointer gap-3 rounded-lg border p-3 text-[13px] ${decision === d.value ? "border-sky/60 bg-sky/[0.08]" : "border-edge hover:border-edge2"}`}>
                   <input type="radio" name="decision" value={d.value} checked={decision === d.value} onChange={() => setDecision(d.value)} className="mt-0.5 accent-[#3fd0a5]" />
                   <span><span className="font-medium text-fg">{d.label}</span><span className="block text-[12px] text-fg3">{d.help}</span></span>
                 </label>

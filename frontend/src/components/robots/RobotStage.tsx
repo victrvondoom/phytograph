@@ -13,7 +13,7 @@ interface Props {
 }
 
 const ACCENT: Record<RobotId, number> = {
-  conductor: 0xa78bfa, intake: 0x7dd3fc, taxonomy: 0x3fd0a5, collector: 0x7fb069, quality: 0xe0a53a, consistency: 0xf2b84b, registry: 0x7dd3fc, dossier: 0xa78bfa,
+  conductor: 0xa78bfa, intake: 0x7dd3fc, taxonomy: 0x53a8ea, collector: 0x7fb069, quality: 0xe0a53a, consistency: 0xf2b84b, registry: 0x7dd3fc, dossier: 0xa78bfa,
 };
 
 export default function RobotStage({ states, selected, onSelect, replaying }: Props) {
@@ -43,7 +43,7 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
     renderer.domElement.setAttribute("aria-label", "3D stage: a conductor robot and seven worker robots, each showing the state of one audit module.");
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x0b1210, 12, 26);
+    scene.fog = new THREE.Fog(0xdcebf6, 12, 26);
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
     camera.position.set(0, 4.2, 10.8);
 
@@ -57,13 +57,13 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.35;
 
-    scene.add(new THREE.HemisphereLight(0xbfe9dc, 0x0b1210, 0.9));
+    scene.add(new THREE.HemisphereLight(0xbfe9dc, 0xdcebf6, 0.9));
     const key = new THREE.DirectionalLight(0xffffff, 1.6);
     key.position.set(4, 9, 6);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
     scene.add(key);
-    const rim = new THREE.PointLight(0x3fd0a5, 1.4, 16);
+    const rim = new THREE.PointLight(0x53a8ea, 1.4, 16);
     rim.position.set(-5, 4, -4);
     scene.add(rim);
 
@@ -71,11 +71,11 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
-    const grid = new THREE.GridHelper(18, 36, 0x1f3a31, 0x15261f);
+    const grid = new THREE.GridHelper(18, 36, 0x9cbf86, 0xb8d6a0);
     (grid.material as THREE.Material).transparent = true;
     (grid.material as THREE.Material).opacity = 0.6;
     scene.add(grid);
-    const ring = new THREE.Mesh(new THREE.RingGeometry(3.85, 3.92, 96), new THREE.MeshBasicMaterial({ color: 0x3fd0a5, transparent: true, opacity: 0.35, side: THREE.DoubleSide }));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(3.85, 3.92, 96), new THREE.MeshBasicMaterial({ color: 0x53a8ea, transparent: true, opacity: 0.35, side: THREE.DoubleSide }));
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.01;
     scene.add(ring);
@@ -101,12 +101,12 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
 
     // Links from the conductor to each worker, and one traveling pulse per worker (the "one voice" channel).
     const pulses = new Map<RobotId, THREE.Mesh>();
-    const lineMat = new THREE.LineBasicMaterial({ color: 0x3fd0a5, transparent: true, opacity: 0.22 });
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x53a8ea, transparent: true, opacity: 0.22 });
     WORKERS.forEach((w) => {
       const p = positions.get(w.id)!;
       const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 1.6, 0), new THREE.Vector3(p.x, 1.6, p.z)]);
       scene.add(new THREE.Line(geo, lineMat));
-      const pulse = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 10), new THREE.MeshBasicMaterial({ color: 0x3fd0a5 }));
+      const pulse = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 10), new THREE.MeshBasicMaterial({ color: 0x53a8ea }));
       scene.add(pulse);
       pulses.set(w.id, pulse);
     });
@@ -161,7 +161,7 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
         animateRobot(rig, s, t, (replayOrder.get(id) ?? 0) * 0.9);
         const shadowMat = rig.shadow.material as THREE.MeshBasicMaterial;
         const selectedRing = sel === id;
-        shadowMat.color.setHex(selectedRing ? 0x3fd0a5 : 0x000000);
+        shadowMat.color.setHex(selectedRing ? 0x53a8ea : 0x000000);
         shadowMat.opacity = selectedRing ? 0.5 : 0.35;
       }
 
@@ -200,7 +200,7 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
   }, []);
 
   return (
-    <div className="relative h-full min-h-[340px] w-full overflow-hidden rounded-xl border border-[#1f3129] bg-[radial-gradient(ellipse_at_50%_20%,#15261f_0%,#0a1a34_70%)]">
+    <div className="relative h-full min-h-[340px] w-full overflow-hidden rounded-xl border border-[#d3e4ee] bg-[radial-gradient(ellipse_at_50%_15%,#ffffff_0%,#e2eff8_60%,#d4e8c6_100%)]">
       <div ref={host} className="absolute inset-0 bottom-14" />
       {!webgl ? (
         <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-[#8aa398]">
@@ -214,7 +214,7 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
               type="button"
               onClick={() => onSelect(r.id)}
               aria-pressed={selected === r.id}
-              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] backdrop-blur ${selected === r.id ? "border-[#ff7b61] bg-[#ff7b61]/15 text-[#e6efe9]" : "border-[#1f3129] bg-[#0a1a34]/85 text-[#c9d8d0] hover:border-[#2f4a40]"}`}
+              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] backdrop-blur ${selected === r.id ? "border-[#53a8ea] bg-[#53a8ea]/15 text-[#143014]" : "border-[#d3e4ee] bg-white/90 text-[#355238] hover:border-[#b3cfe0]"}`}
             >
               <span className="h-2 w-2 rounded-full" style={{ background: `#${STATE_COLOR[states[r.id]].toString(16).padStart(6, "0")}` }} aria-hidden />
               {r.name} · {STATE_LABEL[states[r.id]]}

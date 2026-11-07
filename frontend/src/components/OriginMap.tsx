@@ -18,7 +18,7 @@ interface Props {
 }
 
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
-const BASE_STYLE: StyleSpecification = { version: 8, sources: {}, layers: [{ id: "background", type: "background", paint: { "background-color": "#0a1a34" } }] };
+const BASE_STYLE: StyleSpecification = { version: 8, sources: {}, layers: [{ id: "background", type: "background", paint: { "background-color": "#eef6fb" } }] };
 const STATES_URL = "/api/context/india-states";
 const OPERATIONAL = new Set(["Kerala", "Tamil Nadu"]);
 
@@ -54,15 +54,15 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
       m.addSource("region", { type: "geojson", data: EMPTY });
       m.addSource("records", { type: "geojson", data: EMPTY });
       m.addSource("selected", { type: "geojson", data: EMPTY });
-      m.addLayer({ id: "land-fill", type: "fill", source: "land", paint: { "fill-color": "#132a52" } });
-      m.addLayer({ id: "land-line", type: "line", source: "land", paint: { "line-color": "#2e5088", "line-width": 0.7 } });
-      m.addLayer({ id: "states-fill", type: "fill", source: "states", paint: { "fill-color": ["case", ["==", ["get", "operational"], 1], "#ff7b61", "#1a3562"], "fill-opacity": ["case", ["==", ["get", "operational"], 1], 0.12, 0.35] } });
-      m.addLayer({ id: "states-line", type: "line", source: "states", paint: { "line-color": ["case", ["==", ["get", "operational"], 1], "#ff7b61", "#2e5088"], "line-width": ["case", ["==", ["get", "operational"], 1], 1.6, 0.6] } });
-      m.addLayer({ id: "region-fill", type: "fill", source: "region", paint: { "fill-color": "#ff7b61", "fill-opacity": 0.04 } });
-      m.addLayer({ id: "region-line", type: "line", source: "region", paint: { "line-color": "#ff7b61", "line-width": 1.2, "line-dasharray": [3, 2], "line-opacity": 0.7 } });
+      m.addLayer({ id: "land-fill", type: "fill", source: "land", paint: { "fill-color": "#d9ebb0" } });
+      m.addLayer({ id: "land-line", type: "line", source: "land", paint: { "line-color": "#8fb3a0", "line-width": 0.7 } });
+      m.addLayer({ id: "states-fill", type: "fill", source: "states", paint: { "fill-color": ["case", ["==", ["get", "operational"], 1], "#53a8ea", "#e4f0d2"], "fill-opacity": ["case", ["==", ["get", "operational"], 1], 0.12, 0.35] } });
+      m.addLayer({ id: "states-line", type: "line", source: "states", paint: { "line-color": ["case", ["==", ["get", "operational"], 1], "#53a8ea", "#8fb3a0"], "line-width": ["case", ["==", ["get", "operational"], 1], 1.6, 0.6] } });
+      m.addLayer({ id: "region-fill", type: "fill", source: "region", paint: { "fill-color": "#53a8ea", "fill-opacity": 0.04 } });
+      m.addLayer({ id: "region-line", type: "line", source: "region", paint: { "line-color": "#53a8ea", "line-width": 1.2, "line-dasharray": [3, 2], "line-opacity": 0.7 } });
       m.addLayer({
         id: "records-circle", type: "circle", source: "records",
-        paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3.5, 9, 6.5], "circle-color": ["get", "color"], "circle-stroke-color": "#0a1a34", "circle-stroke-width": 1.4 },
+        paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3.5, 9, 6.5], "circle-color": ["get", "color"], "circle-stroke-color": "#eef6fb", "circle-stroke-width": 1.4 },
       });
       m.addLayer({ id: "selected-ring", type: "circle", source: "selected", paint: { "circle-radius": 12, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#e8f1ec", "circle-stroke-width": 2 } });
       m.on("click", "records-circle", (e) => {
@@ -168,7 +168,7 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
     <div className="relative h-full min-h-[420px] w-full overflow-hidden rounded-2xl border border-edge bg-canvas">
       <div ref={container} className="absolute inset-0" style={{ position: "absolute", inset: 0 }} role="application" aria-label="Map of the declared batch location and retrieved GBIF occurrence records" />
 
-      <div className="absolute left-3 top-3 flex items-center gap-1 rounded-xl border border-edge bg-canvas/90 p-1 text-[12px] backdrop-blur" role="group" aria-label="Basemap">
+      <div className="absolute left-3 top-3 flex items-center gap-1 rounded-xl border border-edge bg-white/95 p-1 text-[12px] backdrop-blur" role="group" aria-label="Basemap">
         <button type="button" onClick={() => setBasemap("context")} aria-pressed={basemap === "context"} className={`rounded-lg px-3 py-1.5 font-medium ${basemap === "context" ? "bg-brand text-white" : "text-fg2 hover:text-fg"}`}>Context</button>
         <button type="button" onClick={() => satelliteAvailable && setBasemap("satellite")} aria-pressed={basemap === "satellite"} disabled={!satelliteAvailable}
           title={satelliteAvailable ? "Satellite imagery, proxied by the server" : "Satellite imagery is not configured on this server"}
@@ -177,7 +177,7 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
         </button>
       </div>
 
-      <div className="pointer-events-none absolute bottom-3 left-3 max-w-[300px] rounded-xl border border-edge bg-canvas/90 p-3 text-[11.5px] text-fg2 backdrop-blur">
+      <div className="pointer-events-none absolute bottom-3 left-3 max-w-[300px] rounded-xl border border-edge bg-white/95 p-3 text-[11.5px] text-fg2 backdrop-blur">
         <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1.5">
           <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rotate-45 bg-fg" />Declared point</span>
           <span className="flex items-center gap-1.5"><span className="inline-block h-0 w-4 border-t border-dashed border-brand" />Approximate region</span>
@@ -190,9 +190,9 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
         <div className="mt-2 text-fg3">Boundaries: Natural Earth 50m (public domain). Kerala and Tamil Nadu highlighted.<br />{drawableCount} plotted{undrawn > 0 ? ` · ${undrawn} without mappable coordinates (see table)` : ""}. No third-party requests from the browser.</div>
       </div>
 
-      {hover ? <div className="pointer-events-none absolute bottom-3 right-3 rounded-lg bg-canvas/90 px-2.5 py-1 font-mono text-[11px] text-fg2">record {hover}</div> : null}
+      {hover ? <div className="pointer-events-none absolute bottom-3 right-3 rounded-lg bg-white/95 px-2.5 py-1 font-mono text-[11px] text-fg2">record {hover}</div> : null}
       {records.length === 0 ? (
-        <div className="pointer-events-none absolute inset-x-0 top-1/2 mx-auto w-fit -translate-y-1/2 rounded-xl border border-edge bg-canvas/90 px-4 py-3 text-center text-[13px] text-fg2">
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 mx-auto w-fit -translate-y-1/2 rounded-xl border border-edge bg-white/95 px-4 py-3 text-center text-[13px] text-fg2">
           No occurrence records on the map yet.<br /><span className="text-fg3">Run the audit to retrieve them.</span>
         </div>
       ) : null}
