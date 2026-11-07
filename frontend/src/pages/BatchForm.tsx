@@ -133,12 +133,12 @@ export default function BatchForm({ mode }: { mode: "create" | "edit" }) {
 
   const field = (name: keyof Form, labelText: string, props: { required?: boolean; hint?: string; type?: string; as?: "input" | "select" | "textarea"; options?: string[]; placeholder?: string; disabled?: boolean }) => {
     const err = errors[name];
-    const common = "mt-1 w-full rounded-md border bg-white px-3 py-2 text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-moss/40 " + (err ? "border-clay" : "border-line");
+    const common = "mt-1 w-full rounded-md border bg-canvas px-3 py-2 text-sm text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 " + (err ? "border-bad" : "border-edge2");
     return (
       <div>
-        <label htmlFor={name} className="block text-sm font-medium text-ink">
+        <label htmlFor={name} className="block text-sm font-medium text-fg">
           {labelText}
-          {props.required ? <span className="text-clay"> *</span> : <span className="text-xs font-normal text-bark/60"> (optional)</span>}
+          {props.required ? <span className="text-bad"> *</span> : <span className="text-xs font-normal text-fg3"> (optional)</span>}
         </label>
         {props.as === "select" ? (
           <select id={name} className={common} value={form[name]} onChange={set(name)} disabled={props.disabled} aria-invalid={!!err}>
@@ -149,7 +149,7 @@ export default function BatchForm({ mode }: { mode: "create" | "edit" }) {
         ) : (
           <input id={name} type={props.type ?? "text"} className={common} value={form[name]} onChange={set(name)} placeholder={props.placeholder} disabled={props.disabled} aria-invalid={!!err} aria-describedby={`${name}-hint`} />
         )}
-        <p id={`${name}-hint`} className={err ? "mt-1 text-xs text-clay" : "mt-1 text-xs text-bark/60"}>{err ?? props.hint ?? ""}</p>
+        <p id={`${name}-hint`} className={err ? "mt-1 text-xs text-bad" : "mt-1 text-xs text-fg3"}>{err ?? props.hint ?? ""}</p>
       </div>
     );
   };
@@ -158,10 +158,10 @@ export default function BatchForm({ mode }: { mode: "create" | "edit" }) {
     <div className="mx-auto max-w-4xl space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link to="/batches" className="text-sm text-moss underline">← Batch inbox</Link>
-          <h1 className="mt-1 text-xl font-semibold text-ink">{mode === "create" ? "New batch" : `Edit batch ${batchId}`}</h1>
+          <Link to="/batches" className="text-sm text-brand underline">← Batch inbox</Link>
+          <h1 className="mt-1 text-xl font-semibold text-fg">{mode === "create" ? "New batch" : `Edit batch ${batchId}`}</h1>
         </div>
-        {loaded?.data_origin === "synthetic" ? <Pill tone="synthetic">Synthetic sample: editing keeps this label</Pill> : null}
+        {loaded?.data_origin === "synthetic" ? <Pill tone="synth">Synthetic sample: editing keeps this label</Pill> : null}
       </div>
 
       <Notice tone="info" title="Enter what the supplier declared">
@@ -205,7 +205,7 @@ export default function BatchForm({ mode }: { mode: "create" | "edit" }) {
         </Card>
 
         <div className="flex items-center justify-end gap-3">
-          <Link to={mode === "edit" ? `/batches/${encodeURIComponent(batchId)}/audit` : "/batches"} className="text-sm text-bark underline">Cancel</Link>
+          <Link to={mode === "edit" ? `/batches/${encodeURIComponent(batchId)}/audit` : "/batches"} className="text-sm text-fg2 underline">Cancel</Link>
           <Button type="submit" disabled={saving}>{saving ? "Saving…" : mode === "create" ? "Create batch" : "Save changes"}</Button>
         </div>
       </form>

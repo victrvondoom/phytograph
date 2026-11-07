@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Map as MLMap, Marker, NavigationControl, setWorkerUrl, type GeoJSONSource, type StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CLASS_COLOR } from "../lib/labels";
+import { CLASS_HEX } from "./ui";
 import type { OccurrenceRecord, OccurrenceQualityFinding } from "../lib/types";
+
+export type Basemap = "context" | "satellite";
 
 interface Props {
   declared: { lat: number; lon: number; name: string } | null;
@@ -12,36 +14,36 @@ interface Props {
   onSelect: (gbifId: string) => void;
   regionGeoJson: GeoJSON.Feature | null;
   landUrl: string;
+  satelliteAvailable: boolean;
 }
 
-// No basemap tiles: the map draws only backend-served data, so the browser makes no third-party requests.
-const STYLE: StyleSpecification = {
-  version: 8,
-  sources: {},
-  layers: [{ id: "background", type: "background", paint: { "background-color": "#e9ede4" } }],
-};
-
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
+const BASE_STYLE: StyleSpecification = { version: 8, sources: {}, layers: [{ id: "background", type: "background", paint: { "background-color": "#070e0c" } }] };
 
-/** Display-only: a point can be drawn only if its coordinates are finite, in range and not the (0,0) placeholder.
- *  The quality class comes from the backend; records failing this stay in the evidence table. */
+/** Display-only: a point is drawable when its coordinates are finite, in range and not the (0,0) placeholder.
+ *  Quality classes come from the backend; records that fail this stay in the evidence table. */
 export function drawable(r: OccurrenceRecord): r is OccurrenceRecord & { lat: number; lon: number } {
   return r.lat !== null && r.lon !== null && Number.isFinite(r.lat) && Number.isFinite(r.lon)
     && Math.abs(r.lat) <= 90 && Math.abs(r.lon) <= 180 && !(r.lat === 0 && r.lon === 0);
 }
 
-export default function OriginMap({ declared, records, classes, selectedId, onSelect, regionGeoJson, landUrl }: Props) {
+export default function OriginMap({ declared, records, classes, selectedId, onSelect, regionGeoJson, landUrl, satelliteAvailable }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
-  const [isReady, setIsReady] = useState(false);
   const marker = useRef<Marker | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [basemap, setBasemap] = useState<Basemap>("context");
+  const [hover, setHover] = useState<string | null>(null);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
+
+  const drawableCount = records.filter(drawable).length;
+  const undrawn = records.length - drawableCount;
 
   useEffect(() => {
     if (!container.current || map.current) return;
     setWorkerUrl("/maplibre-gl-worker.mjs");
-    const m = new MLMap({ container: container.current, style: STYLE, center: [77, 11], zoom: 6, attributionControl: false });
+    const m = new MLMap({ container: container.current, style: BASE_STYLE, center: [77, 11], zoom: 6, attributionControl: false });
     map.current = m;
     m.addControl(new NavigationControl({ showCompass: false }), "top-right");
     m.on("load", async () => {
@@ -49,47 +51,54 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
       m.addSource("region", { type: "geojson", data: EMPTY });
       m.addSource("records", { type: "geojson", data: EMPTY });
       m.addSource("selected", { type: "geojson", data: EMPTY });
-      m.addLayer({ id: "land-fill", type: "fill", source: "land", paint: { "fill-color": "#d5dbc9" } });
-      m.addLayer({ id: "land-line", type: "line", source: "land", paint: { "line-color": "#aeb8a0", "line-width": 0.6 } });
-      m.addLayer({ id: "region-line", type: "line", source: "region", paint: { "line-color": "#2f5d4a", "line-width": 1.2, "line-dasharray": [3, 2] } });
+      m.addLayer({ id: "land-fill", type: "fill", source: "land", paint: { "fill-color": "#15271f" } });
+      m.addLayer({ id: "land-line", type: "line", source: "land", paint: { "line-color": "#2a4a3f", "line-width": 0.7 } });
+      m.addLayer({ id: "region-fill", type: "fill", source: "region", paint: { "fill-color": "#3fd0a5", "fill-opacity": 0.04 } });
+      m.addLayer({ id: "region-line", type: "line", source: "region", paint: { "line-color": "#3fd0a5", "line-width": 1.2, "line-dasharray": [3, 2], "line-opacity": 0.7 } });
       m.addLayer({
-        id: "records-circle",
-        type: "circle",
-        source: "records",
-        paint: {
-          "circle-radius": 5.5,
-          "circle-color": ["get", "color"],
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 1.2,
-        },
+        id: "records-circle", type: "circle", source: "records",
+        paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3.5, 9, 6.5], "circle-color": ["get", "color"], "circle-stroke-color": "#070e0c", "circle-stroke-width": 1.4 },
       });
-      m.addLayer({
-        id: "selected-ring",
-        type: "circle",
-        source: "selected",
-        paint: { "circle-radius": 11, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#1d2a24", "circle-stroke-width": 2 },
-      });
+      m.addLayer({ id: "selected-ring", type: "circle", source: "selected", paint: { "circle-radius": 12, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#e8f1ec", "circle-stroke-width": 2 } });
       m.on("click", "records-circle", (e) => {
         const id = e.features?.[0]?.properties?.gbif_id;
         if (typeof id === "string") onSelectRef.current(id);
       });
-      m.on("mouseenter", "records-circle", () => (m.getCanvas().style.cursor = "pointer"));
-      m.on("mouseleave", "records-circle", () => (m.getCanvas().style.cursor = ""));
+      m.on("mousemove", "records-circle", (e) => {
+        m.getCanvas().style.cursor = "pointer";
+        setHover(String(e.features?.[0]?.properties?.gbif_id ?? ""));
+      });
+      m.on("mouseleave", "records-circle", () => { m.getCanvas().style.cursor = ""; setHover(null); });
       try {
         const res = await fetch(landUrl);
         if (res.ok) (m.getSource("land") as GeoJSONSource).setData(await res.json());
-      } catch {
-        /* land context is optional; the map still shows records */
-      }
+      } catch { /* the land outline is optional context */ }
       setIsReady(true);
     });
-    return () => {
-      marker.current?.remove();
-      m.remove();
-      map.current = null;
-    };
+    return () => { marker.current?.remove(); m.remove(); map.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Satellite raster: the browser asks this origin for tiles; the server proxies the provider.
+  useEffect(() => {
+    const m = map.current;
+    if (!m || !isReady || !satelliteAvailable || m.getSource("satellite")) return;
+    m.addSource("satellite", {
+      type: "raster",
+      tiles: [`${window.location.origin}/api/tiles/satellite/{z}/{x}/{y}`],
+      tileSize: 256,
+      maxzoom: 18,
+    });
+    m.addLayer({ id: "satellite", type: "raster", source: "satellite", layout: { visibility: "none" }, paint: { "raster-opacity": 0.95 } }, "land-fill");
+  }, [isReady, satelliteAvailable]);
+
+  useEffect(() => {
+    const m = map.current;
+    if (!m || !isReady) return;
+    const sat = basemap === "satellite" && satelliteAvailable;
+    if (m.getLayer("satellite")) m.setLayoutProperty("satellite", "visibility", sat ? "visible" : "none");
+    for (const id of ["land-fill", "land-line"]) m.setLayoutProperty(id, "visibility", sat ? "none" : "visible");
+  }, [basemap, satelliteAvailable, isReady]);
 
   useEffect(() => {
     const m = map.current;
@@ -102,16 +111,10 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
     if (!m || !isReady) return;
     const fc: GeoJSON.FeatureCollection = {
       type: "FeatureCollection",
-      features: records
-        .filter(drawable)
-        .map((r) => {
-          const cls = classes[r.gbif_id] ?? "usable";
-          return {
-            type: "Feature",
-            geometry: { type: "Point", coordinates: [r.lon as number, r.lat as number] },
-            properties: { gbif_id: r.gbif_id, class: cls, color: CLASS_COLOR[cls] },
-          };
-        }),
+      features: records.filter(drawable).map((r) => {
+        const cls = classes[r.gbif_id] ?? "usable";
+        return { type: "Feature", geometry: { type: "Point", coordinates: [r.lon, r.lat] }, properties: { gbif_id: r.gbif_id, class: cls, color: CLASS_HEX[cls] } };
+      }),
     };
     (m.getSource("records") as GeoJSONSource).setData(fc);
   }, [records, classes, isReady]);
@@ -120,16 +123,15 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
     const m = map.current;
     if (!m || !isReady) return;
     const sel = records.find((r) => r.gbif_id === selectedId);
-    (m.getSource("selected") as GeoJSONSource).setData(
-      sel && drawable(sel)
-        ? { type: "FeatureCollection", features: [{ type: "Feature", geometry: { type: "Point", coordinates: [sel.lon, sel.lat] }, properties: {} }] }
-        : EMPTY,
-    );
+    (m.getSource("selected") as GeoJSONSource).setData(sel && drawable(sel)
+      ? { type: "FeatureCollection", features: [{ type: "Feature", geometry: { type: "Point", coordinates: [sel.lon, sel.lat] }, properties: {} }] }
+      : EMPTY);
+    if (sel && drawable(sel)) m.easeTo({ center: [sel.lon, sel.lat], duration: 500, zoom: Math.max(m.getZoom(), 7.5) });
   }, [selectedId, records, isReady]);
 
   useEffect(() => {
     const m = map.current;
-    if (!m) return;
+    if (!m || !isReady) return;
     marker.current?.remove();
     marker.current = null;
     if (declared) {
@@ -137,34 +139,50 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
       el.setAttribute("role", "img");
       el.setAttribute("aria-label", `Declared collection point: ${declared.name}`);
       el.title = `Declared point: ${declared.name} (${declared.lat}, ${declared.lon})`;
-      el.style.cssText = "width:16px;height:16px;border-radius:2px;background:#1d2a24;border:2px solid #fff;box-shadow:0 0 0 1px #1d2a24;transform:rotate(45deg)";
+      el.style.cssText = "width:14px;height:14px;background:#e8f1ec;transform:rotate(45deg);box-shadow:0 0 0 4px rgba(232,241,236,.18), 0 0 18px rgba(232,241,236,.6)";
       marker.current = new Marker({ element: el }).setLngLat([declared.lon, declared.lat]).addTo(m);
     }
-    const bounds: [number, number][] = [];
-    if (declared) bounds.push([declared.lon, declared.lat]);
-    for (const r of records) if (drawable(r)) bounds.push([r.lon, r.lat]);
-    if (bounds.length) {
-      const lons = bounds.map((b) => b[0]);
-      const lats = bounds.map((b) => b[1]);
-      const pad = 0.4;
-      m.fitBounds([[Math.min(...lons) - pad, Math.min(...lats) - pad], [Math.max(...lons) + pad, Math.max(...lats) + pad]], { padding: 40, duration: 400, maxZoom: 7.5 });
+    const pts: [number, number][] = [];
+    if (declared) pts.push([declared.lon, declared.lat]);
+    for (const r of records) if (drawable(r)) pts.push([r.lon, r.lat]);
+    if (pts.length) {
+      const lons = pts.map((p) => p[0]), lats = pts.map((p) => p[1]), pad = 0.35;
+      m.fitBounds([[Math.min(...lons) - pad, Math.min(...lats) - pad], [Math.max(...lons) + pad, Math.max(...lats) + pad]], { padding: 48, duration: 500, maxZoom: 7.5 });
     }
   }, [declared, records, isReady]);
 
   return (
-    <div className="relative h-[460px] w-full overflow-hidden rounded-md border border-line bg-[#e9ede4] lg:h-[calc(100vh-14rem)] lg:min-h-[460px]">
-      <div ref={container} className="absolute inset-0" style={{ position: "absolute", inset: 0 }} role="application" aria-label="Map of declared batch location and retrieved GBIF occurrence records" />
-      <div className="pointer-events-none absolute left-3 top-3 w-60 rounded-md bg-white/95 p-3 text-xs text-bark shadow-sm ring-1 ring-line">
-        <div className="mb-1.5 font-semibold text-ink">Map key</div>
-        <div className="flex items-center gap-2"><span className="inline-block h-3 w-3 rotate-45 bg-ink" />Declared collection point</div>
-        <div className="mt-1 flex items-center gap-2"><span className="inline-block h-0 w-4 border-t border-dashed border-moss" />Approximate demonstration region</div>
-        <div className="mt-1 flex items-center gap-2"><span className="inline-block h-2.5 w-2.5 rounded-full bg-[#2f7d5b]" />Usable GBIF record</div>
-        <div className="mt-1 flex items-center gap-2"><span className="inline-block h-2.5 w-2.5 rounded-full bg-[#c08a2b]" />Usable with caution</div>
-        <div className="mt-1 flex items-center gap-2"><span className="inline-block h-2.5 w-2.5 rounded-full bg-[#7b8794]" />Insufficient for spatial check</div>
-        <div className="mt-1 flex items-center gap-2"><span className="inline-block h-2.5 w-2.5 rounded-full bg-[#b4442f]" />Invalid</div>
-        <div className="mt-1 flex items-center gap-2"><span className="inline-block h-2.5 w-2.5 rounded-full bg-[#7a5ea8]" />Duplicate</div>
-        <div className="mt-2 text-bark/60">Records with missing, out-of-range or (0,0) coordinates are not plotted; they remain in the evidence table. No third-party basemap is loaded.</div>
+    <div className="relative h-full min-h-[420px] w-full overflow-hidden rounded-2xl border border-edge bg-canvas">
+      <div ref={container} className="absolute inset-0" style={{ position: "absolute", inset: 0 }} role="application" aria-label="Map of the declared batch location and retrieved GBIF occurrence records" />
+
+      <div className="absolute left-3 top-3 flex items-center gap-1 rounded-xl border border-edge bg-canvas/90 p-1 text-[12px] backdrop-blur" role="group" aria-label="Basemap">
+        <button type="button" onClick={() => setBasemap("context")} aria-pressed={basemap === "context"} className={`rounded-lg px-3 py-1.5 font-medium ${basemap === "context" ? "bg-brand text-[#04110c]" : "text-fg2 hover:text-fg"}`}>Context</button>
+        <button type="button" onClick={() => satelliteAvailable && setBasemap("satellite")} aria-pressed={basemap === "satellite"} disabled={!satelliteAvailable}
+          title={satelliteAvailable ? "Satellite imagery, proxied by the server" : "Satellite imagery is not configured on this server"}
+          className={`rounded-lg px-3 py-1.5 font-medium disabled:cursor-not-allowed disabled:opacity-45 ${basemap === "satellite" ? "bg-brand text-[#04110c]" : "text-fg2 hover:text-fg"}`}>
+          Satellite{satelliteAvailable ? "" : " (not configured)"}
+        </button>
       </div>
+
+      <div className="pointer-events-none absolute bottom-3 left-3 max-w-[300px] rounded-xl border border-edge bg-canvas/90 p-3 text-[11.5px] text-fg2 backdrop-blur">
+        <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1.5">
+          <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rotate-45 bg-fg" />Declared point</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block h-0 w-4 border-t border-dashed border-brand" />Approximate region</span>
+        </div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          {(["usable", "usable_with_caution", "insufficient_for_spatial_check", "invalid", "duplicate"] as const).map((c) => (
+            <span key={c} className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full" style={{ background: CLASS_HEX[c] }} />{c.replaceAll("_", " ")}</span>
+          ))}
+        </div>
+        <div className="mt-2 text-fg3">{drawableCount} plotted{undrawn > 0 ? ` · ${undrawn} without mappable coordinates (see table)` : ""}. No third-party requests from the browser.</div>
+      </div>
+
+      {hover ? <div className="pointer-events-none absolute bottom-3 right-3 rounded-lg bg-canvas/90 px-2.5 py-1 font-mono text-[11px] text-fg2">record {hover}</div> : null}
+      {records.length === 0 ? (
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 mx-auto w-fit -translate-y-1/2 rounded-xl border border-edge bg-canvas/90 px-4 py-3 text-center text-[13px] text-fg2">
+          No occurrence records on the map yet.<br /><span className="text-fg3">Run the audit to retrieve them.</span>
+        </div>
+      ) : null}
     </div>
   );
 }

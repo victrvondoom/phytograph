@@ -205,3 +205,50 @@ export interface AuditListItem {
   identity_status: string;
   method_version: string;
 }
+
+export interface AppStatus {
+  service: string;
+  version: string;
+  gbif_api_base: string;
+  gbif_is_official: boolean;
+  satellite_configured: boolean;
+  write_token_required: boolean;
+  record_modes: string[];
+}
+
+export interface ReviewOut {
+  review_id: string;
+  batch_id: string;
+  audit_id: string;
+  decision: "accept_for_further_review" | "reject" | "request_more_evidence";
+  reviewer: string;
+  note: string;
+  decided_at: string;
+}
+
+export interface ReviewState {
+  batch_id: string;
+  state: "OPEN" | "CLOSED";
+  latest_audit_id: string | null;
+  latest_decision: ReviewOut | null;
+  history: ReviewOut[];
+}
+
+export interface ArchNode {
+  id: string;
+  name: string;
+  module: string;
+  role: string;
+  inputs: string[];
+  outputs: string[];
+  deterministic: boolean;
+  uses_llm: boolean;
+  column: number;
+}
+
+export interface ArchitectureGraph {
+  nodes: ArchNode[];
+  edges: [string, string][];
+  security_controls: { control: string; status: "enforced" | "config"; detail: string }[];
+  statement: string;
+}

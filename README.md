@@ -17,6 +17,8 @@ python -m vanasignal.origin.seed        # labelled SYNTHETIC sample batches
 cd frontend && npm install && npm run dev   # http://localhost:5173
 ```
 
+Optional: `VANASIGNAL_API_TOKEN` (require a bearer token for changes), `VANASIGNAL_SATELLITE_TEMPLATE` (server-side satellite provider, e.g. `https://provider/{z}/{x}/{y}.jpg?key=...`).
+
 Optional: `VANASIGNAL_GBIF_API` overrides the GBIF base URL (only for test servers; data is then labelled NOT GBIF).
 
 Biodiversity intelligence for medicinal-plant occurrence data (EthnoHack 2026, Track 3).

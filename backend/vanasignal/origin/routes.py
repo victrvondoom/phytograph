@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import logging
+
+import httpx
 import threading
 from pathlib import Path
 from typing import Callable
@@ -13,6 +15,10 @@ from fastapi.responses import Response
 
 from ..config import Settings
 from ..gbif import GBIFClient, GBIFError, GBIFUnavailableError
+from . import reviews as rv
+from . import tiles as tl
+from .architecture import EDGES, NODES, SECURITY_CONTROLS
+from .security import safe_csv_cell
 from .audit import run_batch_audit
 from .batches import BatchNotFoundError, BatchRepository, DuplicateBatchError
 from .db import connect
@@ -160,5 +166,61 @@ def build_origin_router(settings: Settings, client_factory: Callable[[], GBIFCli
         if row is None:
             raise HTTPException(404, detail={"code": "audit_not_found"})
         return {"verified": verify_integrity(json.loads(row["report_json"]))}
+
+    # ------------------------------------------------ human review and closure
+    rv.ensure_schema(conn)
+
+    @router.post("/api/batches/{batch_id}/reviews", response_model=rv.ReviewOut, status_code=201, tags=["review"],
+                 summary="Record a human decision against the latest audit (closes the batch review)")
+    def add_review(batch_id: str, body: rv.ReviewIn) -> rv.ReviewOut:
+        with lock:
+            try:
+                repo().get(batch_id)
+                return rv.record_review(conn, batch_id, body)
+            except BatchNotFoundError as exc:
+                raise HTTPException(404, detail={"code": "batch_not_found"}) from exc
+            except LookupError as exc:
+                raise HTTPException(409, detail={"code": "no_audit", "message": "Run an audit before recording a review."}) from exc
+            except ValueError as exc:
+                raise HTTPException(409, detail={"code": "stale_audit", "message": "This decision refers to an older audit. Review the latest audit."}) from exc
+
+    @router.get("/api/batches/{batch_id}/review", response_model=rv.ReviewState, tags=["review"], summary="Review state (OPEN or CLOSED) and history")
+    def review(batch_id: str) -> rv.ReviewState:
+        with lock:
+            try:
+                repo().get(batch_id)
+            except BatchNotFoundError as exc:
+                raise HTTPException(404, detail={"code": "batch_not_found"}) from exc
+            return rv.review_state(conn, batch_id)
+
+    @router.get("/api/batches/{batch_id}/audit/records.csv", tags=["audits"], summary="Record-level evidence as CSV (formula-safe)")
+    def records_csv(batch_id: str) -> Response:
+        with lock:
+            report = _latest(batch_id)
+        cols = ["gbif_id", "record_class", "explanation", "distance_km_to_declared", "dataset_key", "source_url"]
+        lines = [",".join(cols)]
+        for f in (report.quality.findings if report.quality else []):
+            row = [safe_csv_cell(getattr(f, c)) for c in cols]
+            lines.append(",".join('"' + v.replace('"', '""') + '"' for v in row))
+        return Response("\n".join(lines) + "\n", media_type="text/csv; charset=utf-8",
+                        headers={"Content-Disposition": f'attachment; filename="{report.audit_id}-records.csv"'})
+
+    @router.get("/api/architecture", tags=["architecture"], summary="Module graph and security controls for the architecture studio")
+    def architecture() -> dict:
+        return {"nodes": NODES, "edges": EDGES, "security_controls": SECURITY_CONTROLS,
+                "statement": "Every node is deterministic code. No node calls a language model."}
+
+    @router.get("/api/tiles/satellite/{z}/{x}/{y}", tags=["map"], summary="Satellite tile proxied by the server (key never reaches the browser)")
+    def satellite(z: int, x: int, y: int) -> Response:
+        if not tl.valid_tile(z, x, y):
+            raise HTTPException(400, detail={"code": "invalid_tile"})
+        try:
+            body, ctype = tl.fetch_tile(settings.data_dir / "cache" / "tiles", z, x, y)
+        except LookupError as exc:
+            raise HTTPException(404, detail={"code": "satellite_not_configured", "message": "No satellite provider is configured on the server."}) from exc
+        except (RuntimeError, httpx.HTTPError) as exc:
+            log.warning("satellite tile failed: %s", exc)
+            raise HTTPException(502, detail={"code": "tile_provider_error", "message": "The satellite provider did not return a tile."}) from exc
+        return Response(body, media_type=ctype, headers={"Cache-Control": "public, max-age=86400"})
 
     return router

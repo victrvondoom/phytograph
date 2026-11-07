@@ -15,6 +15,9 @@ from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
 from . import benchmark as bm
 from .config import Settings, get_settings
+from .gbif import GBIF_API, GBIF_IS_OFFICIAL
+from .origin.security import SecurityMiddleware, api_token
+from .origin.tiles import template as satellite_template
 from .gbif import GBIFClient, GBIFError, GBIFUnavailableError, SpeciesNotResolvedError
 from .models import AnalysisRequest, BenchmarkRequest, ResolveSpeciesRequest, SimulationRequest
 from .pipeline import GBIFSource, NoRecordsError, PipelineOptions, load_run, run_analysis
@@ -80,7 +83,20 @@ def create_app(settings: Settings | None = None, client: GBIFClient | None = Non
             state["origin_client"] = GBIFClient(settings.cache_dir, timeout=12.0, max_retries=2, backoff_seconds=1.0, transport=state.get("transport"))
         return state["origin_client"]
 
+    app.add_middleware(SecurityMiddleware)
     app.include_router(build_origin_router(settings, origin_client))
+
+    @app.get("/api/status", tags=["meta"], summary="Fast capability flags for the UI (no external calls)")
+    def status() -> dict[str, Any]:
+        return {
+            "service": "VanaSignal Origin Gate",
+            "version": "0.2.0",
+            "gbif_api_base": GBIF_API,
+            "gbif_is_official": GBIF_IS_OFFICIAL,
+            "satellite_configured": satellite_template() is not None,
+            "write_token_required": api_token() is not None,
+            "record_modes": ["live", "cached", "non_gbif_test_endpoint"],
+        }
 
     @app.get("/api/health")
     def health() -> dict[str, Any]:
@@ -94,6 +110,8 @@ def create_app(settings: Settings | None = None, client: GBIFClient | None = Non
             "gbif": gbif_status,
             "land_mask_configured": True,
             "protected_areas_configured": settings.wdpa_path is not None,
+            "satellite_configured": satellite_template() is not None,
+            "write_token_required": api_token() is not None,
             "runs_stored": len(list(settings.runs_dir.glob("*/summary.json"))),
         }
 

@@ -1,4 +1,4 @@
-import type { AuditListItem, AuditReport, BatchCreate, BatchRead, OccurrenceSearchResult, TaxonomyResolution } from "./types";
+import type { ArchitectureGraph, AppStatus, AuditListItem, AuditReport, BatchCreate, BatchRead, OccurrenceSearchResult, ReviewOut, ReviewState, TaxonomyResolution } from "./types";
 
 /** All requests go to the same origin (proxied to the backend). The browser never calls GBIF directly. */
 export class ApiError extends Error {
@@ -69,6 +69,12 @@ export const api = {
     const q = new URLSearchParams({ taxon_key: String(p.taxonKey), lat: String(p.lat), lon: String(p.lon), radius_km: String(p.radiusKm ?? 100) });
     return request<OccurrenceSearchResult>(`/api/occurrences/search?${q.toString()}`);
   },
+  status: () => request<AppStatus>("/api/status"),
+  architecture: () => request<ArchitectureGraph>("/api/architecture"),
+  reviewState: (id: string) => request<ReviewState>(`/api/batches/${encodeURIComponent(id)}/review`),
+  addReview: (id: string, body: { audit_id: string; decision: ReviewOut["decision"]; reviewer: string; note: string }) =>
+    request<ReviewOut>(`/api/batches/${encodeURIComponent(id)}/reviews`, { method: "POST", body: JSON.stringify(body) }),
+  csvUrl: (id: string) => `/api/batches/${encodeURIComponent(id)}/audit/records.csv`,
   regionGeoJson: () => request<GeoJSON.Feature>("/api/context/demonstration-region"),
   landGeoJsonUrl: "/api/context/land",
   exportUrl: (id: string, format: "json" | "md") => `/api/batches/${encodeURIComponent(id)}/audit/export.${format}`,

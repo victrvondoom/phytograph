@@ -57,3 +57,11 @@ export function fmtDate(iso: string | null | undefined): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? iso : d.toLocaleString();
 }
+
+export const CLASS_DESCRIPTION: Record<RecordClass, string> = {
+  usable: "No quality problem the rules detect. Counts toward origin status.",
+  usable_with_caution: "Kept and labelled. Reported but not counted toward origin status.",
+  insufficient_for_spatial_check: "No coordinates. Cannot inform a spatial check.",
+  invalid: "Coordinates are out of range or the (0,0) placeholder.",
+  duplicate: "Repeats an identifier or an earlier coordinate and date.",
+};

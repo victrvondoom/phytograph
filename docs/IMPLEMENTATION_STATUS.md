@@ -57,3 +57,26 @@ and 9 are demonstrated only with labelled non-live data.
 - Map crash: invalid coordinates were plotted and corrupted the camera bounds. Now only drawable coordinates are plotted; invalid rows stay in the table.
 - Map readiness used a ref, so data arriving before the map loaded was never drawn. Changed to state.
 - Non-GBIF data was labelled `live`. Added the explicit `non_gbif_test_endpoint` mode across the API and UI.
+
+
+## Phase 2 (2026-11-07): studio, robots, security, closure, satellite
+
+| Item | Status |
+|---|---|
+| 3D robot stage (three.js 0.187.0): conductor + 7 worker robots driven by stored audit outcomes | Done, browser-verified (WebGL canvas renders) |
+| Architecture studio: module graph, selectable robots, security controls | Done, browser-verified |
+| Human review closure: decision bound to a specific audit; batch closes; new audit reopens | Done, tested and browser-verified |
+| Security: headers, 1 MB limit, bearer-token writes, formula-safe CSV | Done, tested |
+| Satellite basemap via server proxy (key server-side, validated coordinates, disk cache) | Done; verified against a STUB provider only |
+| Redesigned UI on one dark design system (rail, status bar, tabs, record drill-down) | Done, browser-verified |
+| Live GBIF | Still NOT verified (api.gbif.org blocked by egress proxy) |
+
+Verification this session: backend 96 passed / 2 skipped (live GBIF). Frontend typecheck and build pass.
+Browser flow (Playwright, production build): zero console errors, zero page errors, zero external requests.
+Screenshots: `docs/evidence/phase2-ui/`, labelled as fixture data with a stub satellite.
+
+Corrections made during this phase:
+- A FastAPI body parameter was silently treated as a query parameter because its model was imported inside a function. Moved to module level.
+- The 3D stage created a new material per robot per frame (a GPU leak). Fixed by reusing the material.
+- The workspace logged an expected 404 for every unaudited batch. The UI now checks the empty history first.
+- The first satellite and tile wiring was tested only against the stub; no claim is made about a real provider.
