@@ -104,7 +104,7 @@ export default function AuditWorkspace() {
           <Link to="/batches" className="text-[12.5px] text-fg3 hover:text-brand">← Batches</Link>
           <div className="mt-2 flex flex-wrap items-center gap-2.5">
             <h1 className="text-2xl font-semibold tracking-tight text-fg">Origin audit <span className="font-mono text-xl text-fg2">· {batch.batch_id}</span></h1>
-            <DataModeBadge mode={batch.data_origin} />
+            {batch.data_origin === "manual" ? <DataModeBadge mode="manual" /> : null}
             {audit?.origin ? <OriginBadge status={audit.origin.status} /> : <Pill>Not audited</Pill>}
             {review ? <Pill tone={review.state === "CLOSED" ? "good" : "warn"}>Review {review.state === "CLOSED" ? "closed" : "open"}</Pill> : null}
           </div>
@@ -123,16 +123,16 @@ export default function AuditWorkspace() {
         </div>
       </div>
 
-      <div className="space-y-3">
-        {isSynthetic ? <Notice tone="synthetic" title="Synthetic demonstration batch">An invented sample. Its results illustrate the workflow and are not evidence about a real shipment.</Notice> : null}
-        {running ? <Notice tone="info" title="Audit running">The conductor is sending work to the robots. Public records are requested through this server and cached with their retrieval times.</Notice> : null}
-        {runError ? <Notice tone="error" title="The audit could not run">{runError.message}</Notice> : null}
-        {audit?.occurrence_error ? <Notice tone="error" title="Public occurrence evidence unavailable">{audit.occurrence_error.message} No occurrence result was produced; this is not a finding about the species.</Notice> : null}
-        {search?.cached_note ? <Notice tone="warn" title="Showing a CACHED GBIF response">{search.cached_note}</Notice> : null}
-        {notGbif ? <Notice tone="error" title="NOT LIVE GBIF DATA: responses came from a non-GBIF endpoint">The connector points at {new URL(tax!.source_url).origin}, a test or fixture server. Do not treat these results as public evidence.</Notice> : null}
-      </div>
+      <ProvenanceStrip
+        synthetic={isSynthetic}
+        cachedAt={search?.cached_note ? search.retrieved_at : null}
+        notGbif={!!notGbif}
+        notGbifOrigin={notGbif && tax ? new URL(tax.source_url).origin : null}
+        errorMessage={audit?.occurrence_error?.message ?? runError?.message ?? null}
+        running={running}
+      />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
+      <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
         <Card eyebrow="Robot workforce" title="The conductor and its seven specialist robots" className="p-3 sm:p-4" actions={
           <Pill tone={replaying ? "warn" : audit ? "good" : "neutral"}>{replaying ? "Replaying recorded steps" : audit ? "Showing recorded outcome" : "Waiting for an audit"}</Pill>
         }>
@@ -144,7 +144,7 @@ export default function AuditWorkspace() {
           </p>
         </Card>
 
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <Card eyebrow="Origin consistency" title="Origin consistency">
             {origin ? (
               <div className="space-y-4">
@@ -184,7 +184,7 @@ export default function AuditWorkspace() {
         </div>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
+      <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
         <div className="h-[560px]">
           <OriginMap
             declared={declared}
@@ -325,7 +325,7 @@ export default function AuditWorkspace() {
         {audit ? <div className="mt-4"><a className="text-[12.5px] text-brand underline" href={api.exportUrl(batch.batch_id, "json")}>Download the full audit (JSON)</a></div> : null}
       </Card>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-2">
         <Card eyebrow="Provenance" title="Data sources">
           <ul className="space-y-4 text-[13px]">
             <li>
@@ -366,6 +366,26 @@ export default function AuditWorkspace() {
           ) : null}
         </Card>
       </div>
+    </div>
+  );
+}
+
+function ProvenanceStrip({ synthetic, cachedAt, notGbif, notGbifOrigin, errorMessage, running }: { synthetic: boolean; cachedAt: string | null; notGbif: boolean; notGbifOrigin: string | null; errorMessage: string | null; running: boolean }) {
+  const chips: { tone: "synth" | "warn" | "bad" | "info"; text: string }[] = [];
+  if (synthetic) chips.push({ tone: "synth", text: "Synthetic sample: invented shipment" });
+  if (cachedAt) chips.push({ tone: "warn", text: `Cached GBIF response from ${fmtDate(cachedAt)}` });
+  if (notGbif) chips.push({ tone: "bad", text: `Not GBIF: test endpoint ${notGbifOrigin ?? ""}` });
+  if (running) chips.push({ tone: "info", text: "Audit running" });
+  if (errorMessage) chips.push({ tone: "bad", text: errorMessage });
+  if (chips.length === 0) return null;
+  const toneClass = { synth: "bg-synth/10 text-synth ring-synth/30", warn: "bg-warn/10 text-warn ring-warn/30", bad: "bg-bad/10 text-bad ring-bad/30", info: "bg-info/10 text-info ring-info/30" };
+  return (
+    <div role="status" className="rise flex flex-wrap items-center gap-2 rounded-xl border border-edge bg-panel px-3 py-2.5">
+      <span className="mr-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-fg3">Data status</span>
+      {chips.map((c) => (
+        <span key={c.text} className={`inline-flex max-w-full items-center rounded-full px-3 py-1 text-[12px] ring-1 ring-inset ${toneClass[c.tone]}`}>{c.text}</span>
+      ))}
+      {notGbif || cachedAt ? <span className="basis-full text-[12px] text-fg3">Results marked above are not live public evidence. Do not cite them as GBIF occurrence data.</span> : null}
     </div>
   );
 }

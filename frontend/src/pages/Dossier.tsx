@@ -97,7 +97,7 @@ export default function Dossier() {
       {verify ? <Notice tone={verify.startsWith("Integrity verified") ? "ok" : "error"} title="Integrity check">{verify}</Notice> : null}
       {snap.data_origin === "synthetic" ? <Notice tone="synthetic" title="Synthetic demonstration batch">Invented sample data. Not a real supplier shipment.</Notice> : null}
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+      <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
         <Card eyebrow="Closure" title="Human review" className="h-fit">
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <Pill tone={closed ? "good" : "warn"}>{closed ? "Closed" : "Open"}</Pill>
@@ -161,7 +161,7 @@ export default function Dossier() {
         </Card>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-2">
         <Card eyebrow="Declared claim" title="Batch summary">
           <KV items={[
             ["Batch ID", String(snap.batch_id ?? batchId)],
@@ -186,7 +186,7 @@ export default function Dossier() {
         </Card>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-2">
         <Card eyebrow="Identity" title="Botanical identity">
           {audit.taxonomy ? (
             <div className="space-y-4 text-[13.5px]">
@@ -206,7 +206,7 @@ export default function Dossier() {
         </Card>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-2">
         <Card eyebrow="Questions" title="Unresolved questions">
           {audit.unresolved_questions.length ? (
             <ul className="list-disc space-y-2 pl-5 text-[13.5px] leading-relaxed text-fg2">{audit.unresolved_questions.map((x) => <li key={x}>{x}</li>)}</ul>
@@ -244,7 +244,7 @@ export default function Dossier() {
         </div>
       </Card>
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-2">
         <Card eyebrow="Sources" title="Source references">
           <ul className="space-y-3 text-[13px]">
             {audit.sources.map((s, i) => (

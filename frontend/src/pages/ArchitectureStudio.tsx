@@ -3,10 +3,10 @@ import { api, ApiError } from "../lib/api";
 import type { ArchitectureGraph, ArchNode } from "../lib/types";
 import { Card, Loading, Notice, Pill, SectionTitle } from "../components/ui";
 
-const COL_W = 230;
-const ROW_H = 120;
-const NODE_W = 196;
-const NODE_H = 78;
+const COL_W = 240;
+const ROW_H = 132;
+const NODE_W = 216;
+const NODE_H = 100;
 
 export default function ArchitectureStudio() {
   const [graph, setGraph] = useState<ArchitectureGraph | null>(null);
@@ -32,7 +32,7 @@ export default function ArchitectureStudio() {
   if (!graph) return <Loading>Loading architecture…</Loading>;
   const node = graph.nodes.find((n) => n.id === selected) ?? graph.nodes[0];
   const width = 24 + 5 * COL_W;
-  const height = Math.max(...Array.from(layout.values()).map((p) => p.y)) + NODE_H + 48;
+  const height = Math.max(...Array.from(layout.values()).map((p) => p.y)) + NODE_H + 24;
 
   return (
     <div className="space-y-6">
@@ -45,10 +45,10 @@ export default function ArchitectureStudio() {
         <Pill tone="good">{graph.nodes.filter((n) => !n.uses_llm).length} of {graph.nodes.length} modules are deterministic code</Pill>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
-        <Card eyebrow="Data flow" title="Modules and edges" className="overflow-hidden p-0">
+      <div className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
+        <Card eyebrow="Data flow" title="Modules and edges" className="h-fit overflow-hidden p-0">
           <div className="overflow-x-auto p-4">
-            <svg viewBox={`0 0 ${width} ${height}`} width="100%" style={{ minWidth: 900 }} role="img" aria-label="Module graph: the conductor sends work to intake, taxonomy and collector robots; their outputs meet in the consistency robot, which feeds the registry, dossier and human review.">
+            <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{ maxWidth: "none" }} role="img" aria-label="Module graph: the conductor sends work to intake, taxonomy and collector robots; their outputs meet in the consistency robot, which feeds the registry, dossier and human review.">
               <defs>
                 <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                   <path d="M0,0 L10,5 L0,10 z" fill="#3fd0a5" opacity="0.7" />
@@ -73,10 +73,10 @@ export default function ArchitectureStudio() {
                   <g key={n.id} transform={`translate(${p.x},${p.y})`} onClick={() => setSelected(n.id)} className="cursor-pointer" role="button" tabIndex={0}
                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSelected(n.id); }} aria-pressed={active} aria-label={`${n.name}: ${n.role}`}>
                     <rect width={NODE_W} height={NODE_H} rx="14" fill={active ? "#13241e" : "#0f1816"} stroke={active ? "#3fd0a5" : n.deterministic ? "#28423a" : "#a78bfa"} strokeWidth={active ? 2 : 1.2} />
-                    <text x="16" y="28" fill="#e8f1ec" fontSize="13.5" fontWeight="600">{n.name}</text>
-                    <text x="16" y="48" fill="#6f8a7f" fontSize="11" fontFamily="ui-monospace, Menlo, monospace">{n.module}</text>
-                    <circle cx={NODE_W - 16} cy="20" r="4" fill={n.deterministic ? "#3fd0a5" : "#a78bfa"} />
-                    <text x="16" y="88" fill="#a3bcb0" fontSize="10.5">{n.deterministic ? "deterministic code · no LLM" : "human decision"}</text>
+                    <text x="16" y="30" fill="#e8f1ec" fontSize="13" fontWeight="600">{n.name}</text>
+                    <text x="16" y="52" fill="#6f8a7f" fontSize="10.5" fontFamily="ui-monospace, Menlo, monospace">{n.module}</text>
+                    <circle cx={NODE_W - 16} cy="22" r="4" fill={n.deterministic ? "#3fd0a5" : "#a78bfa"} />
+                    <text x="16" y="78" fill="#a3bcb0" fontSize="10.5">{n.deterministic ? "deterministic · no LLM" : "human decision"}</text>
                   </g>
                 );
               })}
@@ -84,7 +84,7 @@ export default function ArchitectureStudio() {
           </div>
         </Card>
 
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <Card eyebrow="Selected robot" title={node.name}>
             <div className="space-y-4 text-[13.5px] leading-relaxed">
               <p className="text-fg">{node.role}</p>

@@ -58,7 +58,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 border-b border-edge bg-canvas/85 backdrop-blur">
-          <div className="flex items-center justify-between gap-4 px-5 py-3">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
             <div className="flex min-w-0 items-center gap-3">
               <span className="md:hidden"><Logo /></span>
               <div className="min-w-0">
@@ -71,11 +71,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <div className="flex flex-wrap items-center justify-end gap-2 text-[11.5px]">
               {offline ? <span className="rounded-full bg-bad/10 px-2.5 py-1 text-bad ring-1 ring-inset ring-bad/30">API offline</span> : status ? (
                 <>
-                  <span className="rounded-full bg-brand/10 px-2.5 py-1 text-brand ring-1 ring-inset ring-brand/25">API online · v{status.version}</span>
-                  <span className={`rounded-full px-2.5 py-1 ring-1 ring-inset ${status.gbif_is_official ? "bg-brand/10 text-brand ring-brand/25" : "bg-bad/10 text-bad ring-bad/30"}`}>
+                  <span className="rounded-full bg-brand/10 px-2.5 py-1 text-brand ring-1 ring-inset ring-brand/25"><span className="sm:hidden">API ●</span><span className="hidden sm:inline">API online · v{status.version}</span></span>
+                  <span className={`hidden rounded-full px-2.5 py-1 ring-1 ring-inset md:inline-flex ${status.gbif_is_official ? "bg-brand/10 text-brand ring-brand/25" : "bg-bad/10 text-bad ring-bad/30"}`}>
                     {status.gbif_is_official ? "GBIF: api.gbif.org" : "GBIF: test endpoint (not GBIF)"}
                   </span>
-                  <span className={`rounded-full px-2.5 py-1 ring-1 ring-inset ${status.write_token_required ? "bg-violet/10 text-violet ring-violet/30" : "bg-white/[0.04] text-fg3 ring-edge2"}`}>
+                  <span className={`hidden rounded-full px-2.5 py-1 ring-1 ring-inset lg:inline-flex ${status.write_token_required ? "bg-violet/10 text-violet ring-violet/30" : "bg-white/[0.04] text-fg3 ring-edge2"}`}>
                     {status.write_token_required ? "Writes: token required" : "Writes: open (local)"}
                   </span>
                 </>

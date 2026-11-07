@@ -60,17 +60,17 @@ export default function BatchInbox() {
           <Empty title="No batches yet" action={<Button href="/batches/new">Create a batch</Button>}>Create a batch from a supplier claim.</Empty>
         ) : null}
         {batches && batches.length > 0 ? (
-          <Table caption="Batches" headers={["Batch", "Supplier", "Declared botanical name", "Location", "Data", "Completeness", "Missing evidence", "Latest audit", "Review", ""]} minWidth={1180}>
+          <Table caption="Batches" headers={["Batch", "Supplier", "Declared botanical name", "Location", "Data", "Completeness", "Missing evidence", "Latest audit", "Review", ""]} minWidth={1100}>
             {batches.map((b) => (
               <tr key={b.batch_id} className="border-b border-edge/60 align-top transition-colors hover:bg-white/[0.025]">
-                <td className="px-3 py-3.5 font-mono text-[12px] text-fg">{b.batch_id}</td>
+                <td className="whitespace-nowrap px-3 py-3.5 font-mono text-[12px] text-fg">{b.batch_id}</td>
                 <td className="px-3 py-3.5 text-fg">{b.supplier_name}</td>
                 <td className="px-3 py-3.5 italic text-fg">{b.declared_botanical_name}</td>
                 <td className="px-3 py-3.5">
                   <div className="text-fg2">{[b.declared_district, b.declared_state, b.declared_country].filter(Boolean).join(", ")}</div>
                   <div className="mt-0.5 font-mono text-[11px] text-fg3">{b.latitude !== null && b.longitude !== null ? `${b.latitude}, ${b.longitude}` : "coordinates unknown"}</div>
                 </td>
-                <td className="px-3 py-3.5"><DataModeBadge mode={b.data_origin} /></td>
+                <td className="whitespace-nowrap px-3 py-3.5"><DataModeBadge mode={b.data_origin} /></td>
                 <td className="px-3 py-3.5">
                   <div className="flex items-center gap-2">
                     <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/[0.07]"><div className="h-full rounded-full bg-brand" style={{ width: `${Math.round(b.completeness.completeness_share * 100)}%` }} /></div>
@@ -78,10 +78,18 @@ export default function BatchInbox() {
                   </div>
                 </td>
                 <td className="px-3 py-3.5">
-                  <Missing items={[...b.completeness.required_missing, ...b.completeness.optional_missing].map((f) => FIELD_LABEL[f] ?? f).slice(0, 4)} />
+                  {(() => {
+                    const all = [...b.completeness.required_missing, ...b.completeness.optional_missing].map((f) => FIELD_LABEL[f] ?? f);
+                    return all.length === 0 ? <Missing items={[]} /> : (
+                      <span className="flex flex-wrap items-center gap-1.5">
+                        <Missing items={all.slice(0, 2)} />
+                        {all.length > 2 ? <span className="text-[11.5px] text-fg3">+{all.length - 2} more</span> : null}
+                      </span>
+                    );
+                  })()}
                   {b.completeness.required_missing.length > 0 ? <div className="mt-1 text-[11.5px] text-bad">{b.completeness.required_missing.length} required missing</div> : null}
                 </td>
-                <td className="px-3 py-3.5">
+                <td className="px-3 py-3.5 whitespace-nowrap">
                   {b.latest_audit ? (
                     <div className="space-y-1.5"><OriginBadge status={b.latest_audit.origin_status} /><div className="text-[11px] text-fg3">{new Date(b.latest_audit.created_at).toLocaleString()}</div></div>
                   ) : <Pill>Not audited</Pill>}
@@ -89,7 +97,7 @@ export default function BatchInbox() {
                 <td className="px-3 py-3.5">
                   {b.latest_audit ? <Pill tone={reviews[b.batch_id] === "CLOSED" ? "good" : "warn"}>{reviews[b.batch_id] === "CLOSED" ? "Closed" : "Open"}</Pill> : <span className="text-[12px] text-fg3">—</span>}
                 </td>
-                <td className="px-3 py-3.5">
+                <td className="px-3 py-3.5 whitespace-nowrap">
                   <div className="flex gap-2">
                     <Link className="rounded-lg bg-brand px-3 py-1.5 text-[12px] font-semibold text-[#04110c] hover:bg-[#5be0bb]" to={`/batches/${encodeURIComponent(b.batch_id)}/audit`}>Open audit</Link>
                     <Link className="rounded-lg border border-edge2 px-3 py-1.5 text-[12px] font-medium text-fg2 hover:border-brand/50 hover:text-brand" to={`/batches/${encodeURIComponent(b.batch_id)}/edit`}>Edit</Link>

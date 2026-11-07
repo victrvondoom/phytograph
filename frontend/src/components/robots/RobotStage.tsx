@@ -36,19 +36,22 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     host.current.appendChild(renderer.domElement);
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
+    renderer.domElement.style.display = "block";
     renderer.domElement.setAttribute("role", "img");
     renderer.domElement.setAttribute("aria-label", "3D stage: a conductor robot and seven worker robots, each showing the state of one audit module.");
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x0b1210, 12, 26);
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.set(0, 4.6, 10.5);
+    camera.position.set(0, 4.2, 10.8);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.enablePan = false;
     controls.minDistance = 6;
-    controls.maxDistance = 16;
+    controls.maxDistance = 17;
     controls.maxPolarAngle = Math.PI / 2.1;
     controls.target.set(0, 1.7, 0);
     controls.autoRotate = true;
@@ -112,6 +115,8 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
       const { clientWidth: w, clientHeight: h } = host.current!;
       renderer.setSize(w, h, false);
       camera.aspect = w / Math.max(h, 1);
+      // Narrow canvases (phones): widen the field of view so the whole group stays in frame.
+      camera.fov = camera.aspect >= 1 ? 38 : Math.min(72, (38 / Math.max(camera.aspect, 0.3)) * 0.8);
       camera.updateProjectionMatrix();
     };
     resize();
@@ -196,20 +201,20 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
 
   return (
     <div className="relative h-full min-h-[340px] w-full overflow-hidden rounded-xl border border-[#1f3129] bg-[radial-gradient(ellipse_at_50%_20%,#15261f_0%,#0b1210_70%)]">
-      <div ref={host} className="absolute inset-0" />
+      <div ref={host} className="absolute inset-0 bottom-14" />
       {!webgl ? (
         <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-[#8aa398]">
           WebGL is unavailable in this browser. The robot states are listed on the right.
         </div>
       ) : null}
-      <ul className="pointer-events-none absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5" aria-label="Robot states">
+      <ul className="absolute inset-x-0 bottom-0 hidden flex-wrap justify-center gap-1.5 p-3 sm:flex" aria-label="Robot states">
         {ROBOTS.map((r) => (
           <li key={r.id}>
             <button
               type="button"
               onClick={() => onSelect(r.id)}
               aria-pressed={selected === r.id}
-              className={`pointer-events-auto flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] backdrop-blur ${selected === r.id ? "border-[#3fd0a5] bg-[#3fd0a5]/15 text-[#e6efe9]" : "border-[#1f3129] bg-[#0b1210]/80 text-[#c9d8d0] hover:border-[#2f4a40]"}`}
+              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] backdrop-blur ${selected === r.id ? "border-[#3fd0a5] bg-[#3fd0a5]/15 text-[#e6efe9]" : "border-[#1f3129] bg-[#0b1210]/85 text-[#c9d8d0] hover:border-[#2f4a40]"}`}
             >
               <span className="h-2 w-2 rounded-full" style={{ background: `#${STATE_COLOR[states[r.id]].toString(16).padStart(6, "0")}` }} aria-hidden />
               {r.name} · {STATE_LABEL[states[r.id]]}

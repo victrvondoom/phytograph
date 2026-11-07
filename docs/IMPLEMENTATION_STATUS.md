@@ -80,3 +80,17 @@ Corrections made during this phase:
 - The 3D stage created a new material per robot per frame (a GPU leak). Fixed by reusing the material.
 - The workspace logged an expected 404 for every unaudited batch. The UI now checks the empty history first.
 - The first satellite and tile wiring was tested only against the stub; no claim is made about a real provider.
+
+## Frontend fix pass (2026-11-07)
+
+Fixed after review of the Phase 2 UI:
+- Phone layout scrolled sideways by 32 px. A two-column grid had no single-column base, so the map's canvas width set the column width. Now 0 px overflow.
+- Three stacked banners above the audit replaced by one "Data status" strip with the same warnings.
+- Robot status chips no longer cover the robots (desktop: moved under the stage; phone: hidden, status list shown beside it).
+- WebGL canvas was sized to its 2x buffer (628 px CSS on a 390 px screen). Now sized by CSS to its container; the camera field of view widens on narrow screens.
+- Header: phones show only the API status; GBIF and token pills appear from tablet width.
+- Inbox: batch IDs and action buttons no longer wrap; missing evidence shows two items and a count.
+- Architecture graph: captions moved inside their boxes; full-size rendering with horizontal scroll instead of clipping.
+- Browser regression flow: zero console errors, zero page errors, zero external requests.
+
+Screenshots: `docs/evidence/phase2-ui/fixed/`.
