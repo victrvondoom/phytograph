@@ -20,9 +20,9 @@ function Icon({ d }: { d: string }) {
 function Logo() {
   return (
     <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden>
-      <rect width="32" height="32" rx="9" fill="#0f1816" stroke="#28423a" />
-      <path d="M8 22 L16 8 L24 22" fill="none" stroke="#3fd0a5" strokeWidth="2.4" strokeLinejoin="round" />
-      <circle cx="16" cy="19" r="2.6" fill="#3fd0a5" />
+      <rect width="32" height="32" rx="9" fill="#0f2243" stroke="#2e5088" />
+      <path d="M8 22 L16 8 L24 22" fill="none" stroke="#ff7b61" strokeWidth="2.4" strokeLinejoin="round" />
+      <circle cx="16" cy="19" r="2.6" fill="#ff7b61" />
     </svg>
   );
 }

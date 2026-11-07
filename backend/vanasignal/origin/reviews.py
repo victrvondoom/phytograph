@@ -58,7 +58,7 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
 
 
 def record_review(conn: sqlite3.Connection, batch_id: str, body: ReviewIn) -> ReviewOut:
-    latest = conn.execute("SELECT audit_id FROM audits WHERE batch_id = ? ORDER BY created_at DESC, audit_id DESC LIMIT 1", (batch_id,)).fetchone()
+    latest = conn.execute("SELECT audit_id FROM audits WHERE batch_id = ? ORDER BY rowid DESC LIMIT 1", (batch_id,)).fetchone()
     if latest is None:
         raise LookupError("no_audit")
     if body.audit_id != latest["audit_id"]:
@@ -73,7 +73,7 @@ def record_review(conn: sqlite3.Connection, batch_id: str, body: ReviewIn) -> Re
 
 
 def review_state(conn: sqlite3.Connection, batch_id: str) -> ReviewState:
-    latest = conn.execute("SELECT audit_id FROM audits WHERE batch_id = ? ORDER BY created_at DESC, audit_id DESC LIMIT 1", (batch_id,)).fetchone()
+    latest = conn.execute("SELECT audit_id FROM audits WHERE batch_id = ? ORDER BY rowid DESC LIMIT 1", (batch_id,)).fetchone()
     rows = conn.execute("SELECT review_id, batch_id, audit_id, decision, reviewer, note, decided_at FROM reviews WHERE batch_id = ? ORDER BY decided_at DESC", (batch_id,)).fetchall()
     history = [ReviewOut(**dict(r)) for r in rows]
     latest_id = latest["audit_id"] if latest else None

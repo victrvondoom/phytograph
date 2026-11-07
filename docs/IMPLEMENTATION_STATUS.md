@@ -94,3 +94,13 @@ Fixed after review of the Phase 2 UI:
 - Browser regression flow: zero console errors, zero page errors, zero external requests.
 
 Screenshots: `docs/evidence/phase2-ui/fixed/`.
+
+## Phase 3 (2026-11-07): real boundaries, portfolio map, navy and coral palette
+
+- Real map: India state boundaries (Natural Earth 50m admin-1, public domain, served by the backend at `/api/context/india-states`). Kerala and Tamil Nadu highlighted on the audit map and the inbox.
+- Portfolio map on the inbox: every batch's declared point, coloured by latest audited origin status.
+- Palette: navy field with a soft white centre light; coral is the single accent for actions and the operational region. Success is green, warnings amber, conflicts red.
+- Bug fixed: the "latest audit" was chosen by a one-second timestamp with a random tie-break. Two audits created in the same second could swap, which made review state flaky (test failed intermittently). All audit queries now use SQLite insertion order.
+- Backend: 97 passed, 2 skipped (live GBIF). Browser regression flow: zero console errors, zero page errors, zero external requests.
+
+Not done in this pass: a design reference was mentioned but not received; live GBIF occurrences; satellite imagery beyond the stub; "resonance" was not defined and is not implemented.

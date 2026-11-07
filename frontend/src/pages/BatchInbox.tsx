@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api, ApiError } from "../lib/api";
 import { FIELD_LABEL } from "../lib/labels";
 import type { BatchRead } from "../lib/types";
+import PortfolioMap from "../components/PortfolioMap";
 import { Button, Card, DataModeBadge, Empty, Loading, Missing, Notice, OriginBadge, Pill, Stat, Table } from "../components/ui";
 
 export default function BatchInbox() {
@@ -54,6 +55,12 @@ export default function BatchInbox() {
 
       {error ? <Notice tone="error" title="Could not load batches">{error.message} <button className="ml-2 underline" onClick={load}>Retry</button></Notice> : null}
 
+      {batches && batches.length > 0 ? (
+        <Card eyebrow="Map" title="Where the declared claims sit" actions={<span className="text-[12px] text-fg3">Colour shows the latest audited origin status. Click a point to open its audit.</span>}>
+          <PortfolioMap batches={batches} />
+        </Card>
+      ) : null}
+
       <Card>
         {batches === null && !error ? <Loading>Loading batches…</Loading> : null}
         {batches !== null && batches.length === 0 ? (
@@ -99,7 +106,7 @@ export default function BatchInbox() {
                 </td>
                 <td className="px-3 py-3.5 whitespace-nowrap">
                   <div className="flex gap-2">
-                    <Link className="rounded-lg bg-brand px-3 py-1.5 text-[12px] font-semibold text-[#04110c] hover:bg-[#5be0bb]" to={`/batches/${encodeURIComponent(b.batch_id)}/audit`}>Open audit</Link>
+                    <Link className="rounded-lg bg-brand px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[#ff9580]" to={`/batches/${encodeURIComponent(b.batch_id)}/audit`}>Open audit</Link>
                     <Link className="rounded-lg border border-edge2 px-3 py-1.5 text-[12px] font-medium text-fg2 hover:border-brand/50 hover:text-brand" to={`/batches/${encodeURIComponent(b.batch_id)}/edit`}>Edit</Link>
                   </div>
                 </td>

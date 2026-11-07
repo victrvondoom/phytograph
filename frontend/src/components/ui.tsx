@@ -30,7 +30,7 @@ export function Card({ title, eyebrow, children, actions, id, className = "" }: 
 export type Tone = "neutral" | "good" | "warn" | "bad" | "synth" | "info" | "violet";
 const TONE: Record<Tone, string> = {
   neutral: "bg-white/[0.04] text-fg2 ring-edge2",
-  good: "bg-brand/10 text-brand ring-brand/30",
+  good: "bg-good/10 text-good ring-good/30",
   warn: "bg-warn/10 text-warn ring-warn/30",
   bad: "bg-bad/10 text-bad ring-bad/30",
   synth: "bg-synth/10 text-synth ring-synth/30",
@@ -132,7 +132,7 @@ export function Button({ children, onClick, type = "button", variant = "primary"
   children: ReactNode; onClick?: () => void; type?: "button" | "submit"; variant?: "primary" | "secondary" | "ghost" | "danger"; disabled?: boolean; href?: string; title?: string; download?: boolean;
 }) {
   const style = {
-    primary: "bg-brand text-[#04110c] hover:bg-[#5be0bb] disabled:bg-brand/35 disabled:text-[#04110c]/60",
+    primary: "bg-brand text-white hover:bg-[#ff9580] disabled:bg-brand/40 disabled:text-white/70",
     secondary: "border border-edge2 bg-raised text-fg hover:border-brand/50 hover:text-brand disabled:opacity-40",
     ghost: "text-brand hover:bg-brand/10 disabled:opacity-40",
     danger: "bg-bad/90 text-white hover:bg-bad disabled:opacity-40",

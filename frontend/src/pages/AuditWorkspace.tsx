@@ -393,7 +393,7 @@ function ProvenanceStrip({ synthetic, cachedAt, notGbif, notGbifOrigin, errorMes
 function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button type="button" onClick={onClick} aria-pressed={active}
-      className={`rounded-full px-3 py-1 text-[12px] font-medium ring-1 ring-inset transition-colors ${active ? "bg-brand text-[#04110c] ring-brand" : "bg-white/[0.03] text-fg2 ring-edge2 hover:text-fg"}`}>
+      className={`rounded-full px-3 py-1 text-[12px] font-medium ring-1 ring-inset transition-colors ${active ? "bg-brand text-white ring-brand" : "bg-white/[0.03] text-fg2 ring-edge2 hover:text-fg"}`}>
       {children}
     </button>
   );

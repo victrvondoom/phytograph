@@ -18,7 +18,9 @@ interface Props {
 }
 
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
-const BASE_STYLE: StyleSpecification = { version: 8, sources: {}, layers: [{ id: "background", type: "background", paint: { "background-color": "#070e0c" } }] };
+const BASE_STYLE: StyleSpecification = { version: 8, sources: {}, layers: [{ id: "background", type: "background", paint: { "background-color": "#0a1a34" } }] };
+const STATES_URL = "/api/context/india-states";
+const OPERATIONAL = new Set(["Kerala", "Tamil Nadu"]);
 
 /** Display-only: a point is drawable when its coordinates are finite, in range and not the (0,0) placeholder.
  *  Quality classes come from the backend; records that fail this stay in the evidence table. */
@@ -48,16 +50,19 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
     m.addControl(new NavigationControl({ showCompass: false }), "top-right");
     m.on("load", async () => {
       m.addSource("land", { type: "geojson", data: EMPTY });
+      m.addSource("states", { type: "geojson", data: EMPTY });
       m.addSource("region", { type: "geojson", data: EMPTY });
       m.addSource("records", { type: "geojson", data: EMPTY });
       m.addSource("selected", { type: "geojson", data: EMPTY });
-      m.addLayer({ id: "land-fill", type: "fill", source: "land", paint: { "fill-color": "#15271f" } });
-      m.addLayer({ id: "land-line", type: "line", source: "land", paint: { "line-color": "#2a4a3f", "line-width": 0.7 } });
-      m.addLayer({ id: "region-fill", type: "fill", source: "region", paint: { "fill-color": "#3fd0a5", "fill-opacity": 0.04 } });
-      m.addLayer({ id: "region-line", type: "line", source: "region", paint: { "line-color": "#3fd0a5", "line-width": 1.2, "line-dasharray": [3, 2], "line-opacity": 0.7 } });
+      m.addLayer({ id: "land-fill", type: "fill", source: "land", paint: { "fill-color": "#132a52" } });
+      m.addLayer({ id: "land-line", type: "line", source: "land", paint: { "line-color": "#2e5088", "line-width": 0.7 } });
+      m.addLayer({ id: "states-fill", type: "fill", source: "states", paint: { "fill-color": ["case", ["==", ["get", "operational"], 1], "#ff7b61", "#1a3562"], "fill-opacity": ["case", ["==", ["get", "operational"], 1], 0.12, 0.35] } });
+      m.addLayer({ id: "states-line", type: "line", source: "states", paint: { "line-color": ["case", ["==", ["get", "operational"], 1], "#ff7b61", "#2e5088"], "line-width": ["case", ["==", ["get", "operational"], 1], 1.6, 0.6] } });
+      m.addLayer({ id: "region-fill", type: "fill", source: "region", paint: { "fill-color": "#ff7b61", "fill-opacity": 0.04 } });
+      m.addLayer({ id: "region-line", type: "line", source: "region", paint: { "line-color": "#ff7b61", "line-width": 1.2, "line-dasharray": [3, 2], "line-opacity": 0.7 } });
       m.addLayer({
         id: "records-circle", type: "circle", source: "records",
-        paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3.5, 9, 6.5], "circle-color": ["get", "color"], "circle-stroke-color": "#070e0c", "circle-stroke-width": 1.4 },
+        paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3.5, 9, 6.5], "circle-color": ["get", "color"], "circle-stroke-color": "#0a1a34", "circle-stroke-width": 1.4 },
       });
       m.addLayer({ id: "selected-ring", type: "circle", source: "selected", paint: { "circle-radius": 12, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#e8f1ec", "circle-stroke-width": 2 } });
       m.on("click", "records-circle", (e) => {
@@ -69,6 +74,14 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
         setHover(String(e.features?.[0]?.properties?.gbif_id ?? ""));
       });
       m.on("mouseleave", "records-circle", () => { m.getCanvas().style.cursor = ""; setHover(null); });
+      try {
+        const st = await fetch(STATES_URL);
+        if (st.ok) {
+          const fc = await st.json();
+          for (const f of fc.features) f.properties.operational = OPERATIONAL.has(f.properties.name) ? 1 : 0;
+          (m.getSource("states") as GeoJSONSource).setData(fc);
+        }
+      } catch { /* boundaries are optional context */ }
       try {
         const res = await fetch(landUrl);
         if (res.ok) (m.getSource("land") as GeoJSONSource).setData(await res.json());
@@ -156,10 +169,10 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
       <div ref={container} className="absolute inset-0" style={{ position: "absolute", inset: 0 }} role="application" aria-label="Map of the declared batch location and retrieved GBIF occurrence records" />
 
       <div className="absolute left-3 top-3 flex items-center gap-1 rounded-xl border border-edge bg-canvas/90 p-1 text-[12px] backdrop-blur" role="group" aria-label="Basemap">
-        <button type="button" onClick={() => setBasemap("context")} aria-pressed={basemap === "context"} className={`rounded-lg px-3 py-1.5 font-medium ${basemap === "context" ? "bg-brand text-[#04110c]" : "text-fg2 hover:text-fg"}`}>Context</button>
+        <button type="button" onClick={() => setBasemap("context")} aria-pressed={basemap === "context"} className={`rounded-lg px-3 py-1.5 font-medium ${basemap === "context" ? "bg-brand text-white" : "text-fg2 hover:text-fg"}`}>Context</button>
         <button type="button" onClick={() => satelliteAvailable && setBasemap("satellite")} aria-pressed={basemap === "satellite"} disabled={!satelliteAvailable}
           title={satelliteAvailable ? "Satellite imagery, proxied by the server" : "Satellite imagery is not configured on this server"}
-          className={`rounded-lg px-3 py-1.5 font-medium disabled:cursor-not-allowed disabled:opacity-45 ${basemap === "satellite" ? "bg-brand text-[#04110c]" : "text-fg2 hover:text-fg"}`}>
+          className={`rounded-lg px-3 py-1.5 font-medium disabled:cursor-not-allowed disabled:opacity-45 ${basemap === "satellite" ? "bg-brand text-white" : "text-fg2 hover:text-fg"}`}>
           Satellite{satelliteAvailable ? "" : " (not configured)"}
         </button>
       </div>
@@ -174,7 +187,7 @@ export default function OriginMap({ declared, records, classes, selectedId, onSe
             <span key={c} className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full" style={{ background: CLASS_HEX[c] }} />{c.replaceAll("_", " ")}</span>
           ))}
         </div>
-        <div className="mt-2 text-fg3">{drawableCount} plotted{undrawn > 0 ? ` · ${undrawn} without mappable coordinates (see table)` : ""}. No third-party requests from the browser.</div>
+        <div className="mt-2 text-fg3">Boundaries: Natural Earth 50m (public domain). Kerala and Tamil Nadu highlighted.<br />{drawableCount} plotted{undrawn > 0 ? ` · ${undrawn} without mappable coordinates (see table)` : ""}. No third-party requests from the browser.</div>
       </div>
 
       {hover ? <div className="pointer-events-none absolute bottom-3 right-3 rounded-lg bg-canvas/90 px-2.5 py-1 font-mono text-[11px] text-fg2">record {hover}</div> : null}

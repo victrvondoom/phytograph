@@ -200,7 +200,7 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
   }, []);
 
   return (
-    <div className="relative h-full min-h-[340px] w-full overflow-hidden rounded-xl border border-[#1f3129] bg-[radial-gradient(ellipse_at_50%_20%,#15261f_0%,#0b1210_70%)]">
+    <div className="relative h-full min-h-[340px] w-full overflow-hidden rounded-xl border border-[#1f3129] bg-[radial-gradient(ellipse_at_50%_20%,#15261f_0%,#0a1a34_70%)]">
       <div ref={host} className="absolute inset-0 bottom-14" />
       {!webgl ? (
         <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-[#8aa398]">
@@ -214,7 +214,7 @@ export default function RobotStage({ states, selected, onSelect, replaying }: Pr
               type="button"
               onClick={() => onSelect(r.id)}
               aria-pressed={selected === r.id}
-              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] backdrop-blur ${selected === r.id ? "border-[#3fd0a5] bg-[#3fd0a5]/15 text-[#e6efe9]" : "border-[#1f3129] bg-[#0b1210]/85 text-[#c9d8d0] hover:border-[#2f4a40]"}`}
+              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] backdrop-blur ${selected === r.id ? "border-[#ff7b61] bg-[#ff7b61]/15 text-[#e6efe9]" : "border-[#1f3129] bg-[#0a1a34]/85 text-[#c9d8d0] hover:border-[#2f4a40]"}`}
             >
               <span className="h-2 w-2 rounded-full" style={{ background: `#${STATE_COLOR[states[r.id]].toString(16).padStart(6, "0")}` }} aria-hidden />
               {r.name} · {STATE_LABEL[states[r.id]]}

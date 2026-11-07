@@ -125,3 +125,12 @@ def test_status_endpoint_is_fast_and_reports_non_gbif_base(tmp_path):
     s = http.get("/api/status").json()
     assert s["gbif_api_base"].startswith("http") and "record_modes" in s
     assert set(s["record_modes"]) == {"live", "cached", "non_gbif_test_endpoint"}
+
+
+def test_india_state_boundaries_are_served_and_include_operational_states(tmp_path):
+    http, _, _ = make_app(tmp_path)
+    r = http.get("/api/context/india-states")
+    assert r.status_code == 200
+    names = {f["properties"]["name"] for f in r.json()["features"]}
+    assert {"Kerala", "Tamil Nadu"} <= names
+    assert "Natural Earth" in r.json()["source"]

@@ -57,7 +57,7 @@ class BatchRepository:
     def _latest_audit(self, batch_id: str) -> AuditSummary | None:
         row = self.conn.execute(
             "SELECT audit_id, created_at, origin_status, identity_status, overall_status FROM audits "
-            "WHERE batch_id = ? ORDER BY created_at DESC, audit_id DESC LIMIT 1",
+            "WHERE batch_id = ? ORDER BY rowid DESC LIMIT 1",
             (batch_id,),
         ).fetchone()
         return AuditSummary(**dict(row)) if row else None

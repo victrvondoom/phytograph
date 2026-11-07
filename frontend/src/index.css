@@ -2,36 +2,41 @@
 
 /* VanaSignal design system. One accent (teal), natural neutrals, and semantic colours used only for meaning. */
 @theme {
-  --color-canvas: #080e0c;
-  --color-panel: #0f1816;
-  --color-panel2: #13211c;
-  --color-raised: #182a24;
-  --color-edge: #1d3029;
-  --color-edge2: #28423a;
-  --color-fg: #e8f1ec;
-  --color-fg2: #a3bcb0;
-  --color-fg3: #6f8a7f;
-  --color-brand: #3fd0a5;
-  --color-brand2: #2aa584;
-  --color-good: #3fd0a5;
-  --color-warn: #e0a53a;
-  --color-bad: #e8674f;
-  --color-info: #7dd3fc;
-  --color-synth: #d7a6ff;
-  --color-violet: #a78bfa;
+  --color-canvas: #0a1a34;
+  --color-panel: #0f2243;
+  --color-panel2: #132a52;
+  --color-raised: #1a3562;
+  --color-edge: #1f3a66;
+  --color-edge2: #2e5088;
+  --color-fg: #f5f8fc;
+  --color-fg2: #b9c8de;
+  --color-fg3: #7e93b5;
+  --color-brand: #ff7b61;
+  --color-brand2: #e5593f;
+  --color-good: #4fd1a5;
+  --color-warn: #f2b65a;
+  --color-bad: #ff6b6b;
+  --color-info: #8ad3ff;
+  --color-synth: #c9a7ff;
+  --color-violet: #a99bff;
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 html, body, #root { height: 100%; }
 body {
-  background: var(--color-canvas);
+  /* Navy field with a soft white light at the centre, as a professional backdrop. */
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(255,255,255,0.13), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(255,255,255,0.05), transparent 70%),
+    var(--color-canvas);
+  background-attachment: fixed;
   color: var(--color-fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   font-feature-settings: "cv11", "ss01";
 }
-::selection { background: rgba(63, 208, 165, 0.3); }
+::selection { background: rgba(255, 123, 97, 0.35); }
 :focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; border-radius: 6px; }
 .maplibregl-ctrl-attrib { display: none; }
 .maplibregl-ctrl-group { background: var(--color-panel) !important; border: 1px solid var(--color-edge) !important; }

@@ -85,7 +85,7 @@ def build_origin_router(settings: Settings, client_factory: Callable[[], GBIFCli
                 raise HTTPException(404, detail={"code": "batch_not_found", "message": f"No batch '{batch_id}'."}) from exc
 
     def _latest(batch_id: str) -> AuditReport:
-        row = conn.execute("SELECT report_json FROM audits WHERE batch_id = ? ORDER BY created_at DESC, audit_id DESC LIMIT 1", (batch_id,)).fetchone()
+        row = conn.execute("SELECT report_json FROM audits WHERE batch_id = ? ORDER BY rowid DESC LIMIT 1", (batch_id,)).fetchone()
         if row is None:
             raise HTTPException(404, detail={"code": "audit_not_found", "message": "This batch has not been audited yet."})
         return AuditReport.model_validate(json.loads(row["report_json"]))
@@ -98,7 +98,7 @@ def build_origin_router(settings: Settings, client_factory: Callable[[], GBIFCli
     @router.get("/api/batches/{batch_id}/audits", tags=["audits"], summary="Audit history for a batch (newest first)")
     def list_audits(batch_id: str) -> list[dict]:
         with lock:
-            rows = conn.execute("SELECT audit_id, created_at, overall_status, origin_status, identity_status, method_version FROM audits WHERE batch_id = ? ORDER BY created_at DESC, audit_id DESC", (batch_id,)).fetchall()
+            rows = conn.execute("SELECT audit_id, created_at, overall_status, origin_status, identity_status, method_version FROM audits WHERE batch_id = ? ORDER BY rowid DESC", (batch_id,)).fetchall()
             return [dict(r) for r in rows]
 
     @router.get("/api/batches/{batch_id}/audit/export.json", tags=["audits"], summary="Download the audit as JSON with an integrity hash")
@@ -153,6 +153,13 @@ def build_origin_router(settings: Settings, client_factory: Callable[[], GBIFCli
         return {"type": "Feature", "properties": {"name": DEMO_REGION["name"], "approximate": True},
                 "geometry": {"type": "Polygon", "coordinates": [[[min_lon, min_lat], [max_lon, min_lat], [max_lon, max_lat], [min_lon, max_lat], [min_lon, min_lat]]]}}
 
+    @router.get("/api/context/india-states", tags=["context"], summary="Natural Earth 50m India state boundaries (public domain)")
+    def india_states() -> Response:
+        path = LAND_PATH.parent / "ne_50m_admin_1_india.geojson"
+        if not path.exists():
+            raise HTTPException(404, detail={"code": "context_missing"})
+        return Response(path.read_bytes(), media_type="application/geo+json")
+
     @router.get("/api/context/land", tags=["context"], summary="Natural Earth 50m land polygons (public domain)")
     def land() -> Response:
         if not LAND_PATH.exists():
@@ -162,7 +169,7 @@ def build_origin_router(settings: Settings, client_factory: Callable[[], GBIFCli
     @router.get("/api/integrity/{batch_id}", tags=["audits"], summary="Recompute and verify the stored audit integrity hash")
     def integrity(batch_id: str) -> dict:
         with lock:
-            row = conn.execute("SELECT report_json FROM audits WHERE batch_id = ? ORDER BY created_at DESC LIMIT 1", (batch_id,)).fetchone()
+            row = conn.execute("SELECT report_json FROM audits WHERE batch_id = ? ORDER BY rowid DESC LIMIT 1", (batch_id,)).fetchone()
         if row is None:
             raise HTTPException(404, detail={"code": "audit_not_found"})
         return {"verified": verify_integrity(json.loads(row["report_json"]))}
